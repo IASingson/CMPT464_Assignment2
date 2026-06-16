@@ -13,8 +13,8 @@
 
 int sfd = -1; //session descriptor 
 
-byte node_ID[1] = {0}; //initial node ID is 0, stored as an array for easy packet writing
-byte group_ID[2] = {0}; //initial group ID is 0, stored as an array for easy packet writing
+int node_ID = 0; //initial node ID is 0
+short group_ID = 0; //initial group ID is 0
 int stored_records;
 int max_records;
 byte delete_request_num;
@@ -123,10 +123,10 @@ fsm Find_Reciever{
 	address response;
 	char *read_packet;
 	char *write_packet;
-	byte packet_group[1];
-	byte request_number[1];
-	byte msg_type[1];
-	byte sender_id[1];
+	byte packet_group;
+	byte request_number;
+	byte msg_type;
+	byte sender_id;
 	int i;
 
 	state Wait_Message:
@@ -382,7 +382,7 @@ fsm Delete_Receiver{
 fsm root
 {
 	char choice;
-	int temp;
+	int db_print_index;
 	
 	state Init:
 		phys_cc1350 (0, MAX_PACKET_LENGTH);
@@ -443,7 +443,7 @@ fsm root
 		// if "D", run Delete protocol
 		else if ((choice == 'D') || (choice == 'd'))
 		{
-			proceed Delete_Handle;
+			proceed Handle_Delete;
 		}
 		
 		// if "R", run the Retrieve protocol
@@ -506,10 +506,10 @@ fsm root
 		ser_out(Ask_Group_ID, "Enter Group ID: ");
 		proceed Ask_Group_ID_In;
 	state Ask_Group_ID_In:
-		ser_inf(Ask_Group_ID_In, "%d", &group_ID);
+		ser_inf(Ask_Group_ID_In, "%d", (int*)&group_ID);
 		proceed Group_Id_Finish;
 	state Group_Id_Finish:
-		ser_outf("%d\r\n\r\n", &group_ID);
+		ser_outf(Group_Id_Finish, "%d\r\n\r\n", &group_ID);
 		proceed Menu_Print;
 
 		// NEW NODE ID
@@ -518,10 +518,10 @@ fsm root
 		ser_out(Ask_Node_ID, "Enter Node ID: ");
 		proceed Ask_Node_ID_In;
 	state Ask_Node_ID_In:
-		ser_inf(Ask_Node_ID_In, "%d", &node_ID);
+		ser_inf(Ask_Node_ID_In, "%d", (int*)&node_ID);
 		proceed Node_Id_Finish;
 	state Node_Id_Finish:
-		ser_outf("%d\r\n\r\n", &node_ID);
+		ser_outf(Node_Id_Finish, "%d\r\n\r\n", &node_ID);
 		proceed Menu_Print;
 		
 	state Show_LocalDB:
@@ -533,7 +533,7 @@ fsm root
 	state Show_LocalDB_Item:
 		// Prints one single line for each entry	
 		if (db_print_index >= max_records) {
-			ser_out("\r\n");
+			ser_out(Show_LocalDB_Item, "\r\n");
 			proceed Menu_Print;
 		}
 		ser_outf(Show_LocalDB_Item, "%d\t%d\t%d\t%s\r\n", db_print_index, database[db_print_index].timestamp, database[db_print_index].owner_id, database[db_print_index].record);
@@ -550,7 +550,7 @@ fsm root
 			database[i].timestamp = 0;
 			database[i].record[0] = '\0';
 		}
-		ser_out("\r\n");
+		ser_out(Reset_DB, "\r\n");
 		proceed Menu_Print;
 }
 
