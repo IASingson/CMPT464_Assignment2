@@ -21,6 +21,12 @@ byte delete_request_num;
 byte delete_destination_id;
 byte delete_response_received;
 byte delete_response_status;
+
+// following used for Find protocols
+byte find_neighbors[20]; //array for neighbor id's
+int find_neighbor_count;
+int find_iteration;
+
 //record structure
 struct Record{
 	byte used; //0 for empty, 1 for used
@@ -30,6 +36,165 @@ struct Record{
 };
 //database storage for up to 40 records
 struct Record database[40];
+
+//temp for testing
+fsm Create{
+	state Skip:
+		finish;
+}
+fsm Retrieve{
+	state Skip:
+		finish;
+}
+
+
+
+fsm Find{
+	// When E or e recieved, will loop through 2 iterations
+	// to find neighbors, will store recieved message and
+	// Then print the results once complete
+	address packet;
+	char *read_packet;
+	int find_neighbor_count;
+	int find_iteration;
+
+	state Reset_Neighbors:
+		// For resetting neighbor list
+		find_neighbor_count = 0;
+		find_iteration = 0;
+		proceed Send_Discovery_Request;
+	
+	state Send_Discovery_Request:
+		find_iteration++;
+		// Create a discovery request
+		packet = tcv_wnp(Send_Discovery_Request, sfd, 8);
+		packet[0] = 0; //Network ID
+		read_packet = (char *)(packet + 1);
+
+		//packet format: Group ID 2 bytes / message type 1 byte / padding
+		*read_packet++ = (group_ID >> 8) & 0xFF;
+		*read_packet++ = group_ID & 0xFF;
+		*read_packet++ = 1; //message type for discovery request
+		*read_packet++ = 0; //padding
+		*read_packet++ = 0; //padding
+		*read_packet++ = 0; //padding
+		*read_packet++ = 0; //padding
+
+		tcv_endp(packet);
+		proceed Wait_For_Responses;
+	
+	state Wait_For_Responses:
+		// wait 3 sec for incoming response
+		delay(3000, Check_Responses);
+
+	state Check_Responses:
+		//checks whether 2 iterations
+		if (find_iteration >= 2) {
+			proceed Print_Neighbors;
+		}
+
+		proceed Send_Discovery_Request;
+	
+	state Print_Neighbors:
+		// print list following format
+		// “\r\n Neighbors: [Listof Neighbors]” 
+		// where [List of Neighbors] should be replaced by the neighbors’ IDs.
+		ser_outf(Print_Neighbors, "\r\n Neighbors: ");
+		for (int i = 0; i < find_neighbor_count; i++) {
+			ser_outf(Print_Neighbors, "%d ", find_neighbors[i]);
+		}
+		finish; 
+}
+
+fsm Find_Reciever{
+	address packet;
+	address response;
+	char *read_packet;
+	char *write_packet;
+	int packet_group;
+	byte msg_type;
+	byte sender_id;
+	int i;
+
+	state Wait_Message:
+		//recieve packets
+		packet = tcv_rnp(Wait_Message, sfd);
+		read_packet = (char *)(packet + 1);
+
+		// first byte is network id, next 2 bytes are group id, next byte is message type, next byte is sender id
+		packet_group = ((byte)read_packet[0] << 8) | (byte)read_packet[1];
+		msg_type = read_packet[2];
+		sender_id = read_packet[4];
+
+		// Two different messages can be recieved, one is by other nodes
+		// Attempting to find neighbors, the other is from neighbors
+		// Responding to our discovery request, the message type will determine
+		// how we handle the message
+
+		// discovery request
+		if (msg_type == 1) {
+			proceed Discovery_Request;
+		}
+
+		// discovery response (only in find fsm)
+		if (msg_type == 2) {
+			proceed Discovery_Response;
+		}
+
+		// Ignores other messages
+		tcv_endp(packet);
+		proceed Wait_Message;
+	
+	state Discovery_Request:
+		// if group id matches and sender id is not this node, send response
+		if (packet_group == group_ID && sender_id != node_ID) {
+			tcv_endp(packet);
+			proceed Send_Discovery_Response;
+		}
+		// Otherwise ignore the message
+		else{
+			tcv_endp(packet);
+			proceed Wait_Message;
+		}
+	
+	state Discovery_Response:
+		// if group id matches and sender id is not this node, add sender id to neighbor list
+		if (packet_group == group_ID && sender_id != node_ID) {
+			// check if sender id is already in neighbor list
+			int found = 0;
+			for (i = 0; i < find_neighbor_count; i++) {
+				if (find_neighbors[i] == sender_id) {
+					found = 1;
+					break;
+				}
+			}
+			// if not found, add to neighbor list
+			if (!found && find_neighbor_count < 20) {
+				find_neighbors[find_neighbor_count++] = sender_id;
+			}
+		}
+		tcv_endp(packet);
+		proceed Wait_Message;
+
+	state Send_Discovery_Response:
+		// Creates the 8 byte response packet
+		// Format Group ID 2 bytes / message type 1 byte / sender id 1 byte / padding
+		response = tcv_wnp(Send_Discovery_Response, sfd, 8);
+		response[0] = 0; //Network ID
+		write_packet = (char *)(response + 1);
+
+		*write_packet++ = (group_ID >> 8) & 0xFF;
+		*write_packet++ = group_ID & 0xFF;
+		*write_packet++ = 2; //message type for discovery response
+		*write_packet++ = node_ID; //sender id
+		*write_packet++ = 0; //padding
+		*write_packet++ = 0; //padding
+		*write_packet++ = 0; //padding
+		*write_packet++ = 0; //padding
+
+		tcv_endp(response);
+		proceed Wait_Message;
+}
 
 fsm Delete{
 	address packet;
