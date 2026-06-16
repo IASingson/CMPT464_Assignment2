@@ -11,6 +11,20 @@
 #define MAX_PACKET_LENGTH 250
 #define MAX_MES_LEN 14
 
+//define message types
+#define MSG_TYPE_DISC_REQ 0
+#define MSG_TYPE_DISC_RESP 1
+#define MSG_TYPE_CREATE 2
+#define MSG_TYPE_DELETE 3
+#define MSG_TYPE_RETRIEVE 4
+#define MSG_TYPE_RESPONSE 5
+
+//set up status messages
+#define STATUS_SUCCESS 0x01 // when an operation is successful
+#define STATUS_DB_FULL 0x02 // when trying to create a record but the database is full
+#define STATUS_DEL_FAIL 0x03 // when trying to delete a record that doesn't exist
+#define STATUS_RETRIEVE_FAIL 0x04 // when trying to retrieve a record that doesn't exist
+
 int sfd = -1; //session descriptor 
 
 int node_ID = 0; //initial node ID is 0
@@ -29,6 +43,17 @@ int find_iteration;
 int find_complete = 0;
 
 int delete_finished = 0;
+
+// pending
+// usedd for keeping track of requests that we have sent and are waiting for a response for, used in both delete and retrieve protocols
+byte pending_type = 0;
+byte pending_request_num = 0; 
+byte pending_destination_id = 0;
+byte pending_active = 0; // used for both delete and retrieve, indicates whether there is a pending request that we are waiting for a response for
+
+byte reply_received = 0;
+byte reply_status = 0;
+byte reply_record[20]; // max record length
 
 //record structure
 struct Record{
@@ -50,7 +75,58 @@ fsm Retrieve{
 		finish;
 }
 
+fsm Receiver{
+	address packet;
+	address response;
 
+	char *p;
+	char *q;
+
+	int packet_group;
+	byte msg_type;
+	byte request_num;
+	byte sender_id;
+	byte receiver_id;
+	byte arg;
+	byte status;
+
+	state RECEIVE:
+		packet = tcv_rnp(Receive, sfd);
+		proceed Process;
+	
+	state PROCESS:
+		p = (char *)(packet + 1);
+		packet_group = ((((int)(byte))p[0]) << 8) | ((int)(byte))p[1];
+		msg_type = p[2];
+		request_num = p[3];
+		sender_id = p[4];
+		receiver_id = p[5];
+		
+		// now determine how to handle the message based on the type
+		if (msg_type == MSG_TYPE_RESPONSE){
+			status = p[6]; // for response messages, the 7th byte is the status of the operation
+
+			if (packet_group == group_ID &&
+				receiver_id == node_ID &&
+				pending_active &&
+				sender_id == pending_destination_id &&
+				request_num == pending_request_num) {
+					reply_status = status;
+					reply_received = 1;
+
+					if (pending_type == TYPE_RETRIEVE && status == STATUS_OK){
+						for (int i=0; i < 20; i++){
+							reply_record[i] = p[7 + i] // 7 for offset for response. 
+						}
+						reply_record[20 - 1] = '\0';
+					}
+				}
+				tcv_endp(packet);
+				proceed RECEIVE;
+			}
+
+			
+}
 
 fsm Find{
 	// When E or e recieved, will loop through 2 iterations
