@@ -50,7 +50,26 @@ fsm Retrieve{
 		finish;
 }
 
+/*
+Old Discovery Request Structure
 
+Network 2 Bytes (mandatory)
+Group ID 2 Bytes
+Message Type 1 Byte (0 for discovery request, 1 for discovery response)
+Request Number 1 Byte (random value to match request and response)
+Sender ID 1 Byte
+Receiver ID 1 Byte (0 for broadcast in discovery request)
+CRC 2 Bytes (can be set to 0 for this assignment)
+
+Optimized Discovery Request Structure:
+
+Network 2 Bytes (mandatory)
+Group ID 2 Bytes
+Combined Sender ID and Message Type 1 Byte (5 Bits for Sender Id and 3 Bits for Message Type)
+Request Number 1 Byte (random value to match request and response)
+Receiver ID 0 bytes (removed unnecessary)
+CRC 2 Bytes (can be set to 0 for this assignment)
+*/
 
 fsm Find{
 	// When E or e recieved, will loop through 2 iterations
@@ -59,9 +78,13 @@ fsm Find{
 	address packet;
 	char *read_packet;
 	int neighbor_print_index;
+	byte type_sender;
+	byte response_type = 1; // Message type for discovery response
+	byte request_type = 0; // Message type for discovery request
 
 	state Reset_Neighbors:
 		// For resetting neighbor list
+		ser_out(Reset_Neighbors, "\r\nFinding Neighbors...\r\n");
 		find_neighbor_count = 0;
 		find_iteration = 0;
 		proceed Send_Discovery_Request;
@@ -77,10 +100,11 @@ fsm Find{
 		//format is Group ID 2 bytes / message type 1 byte / request number 1 byte / sender id 1 byte / receiver id 1 byte / padding
 		*read_packet++ = (group_ID >> 8) & 0xFF;    // Group ID high
 		*read_packet++ = group_ID & 0xFF;           // Group ID low
-		*read_packet++ = 0;                         // Type = 0 (Discovery Request)
+		type_sender = (request_type << 5) | (node_ID & 0x1f); // Combine message type and sender ID into one byte
+		*read_packet++ = type_sender;              // Type and Sender ID combined                         // Type = 0 (Discovery Request)
 		*read_packet++ = (byte)rnd();               // Request Number (random)
-		*read_packet++ = node_ID;                   // Sender ID
-		*read_packet++ = 0;                         // Receiver ID = 0 (broadcast)
+		*read_packet++ = 0;                         // CRC
+		*read_packet++ = 0;                         // CRC
 
 		tcv_endp(packet);
 		proceed Wait_For_Responses;
@@ -118,6 +142,27 @@ fsm Find{
 		finish;
 }
 
+/*
+Old Discovery Response Structure
+
+Network 2 Bytes (mandatory)
+Group ID 2 Bytes
+Message Type 1 Byte (0 for discovery request, 1 for discovery response)
+Request Number 1 Byte (random value to match request and response)
+Sender ID 1 Byte
+Receiver ID 1 Byte (0 for broadcast in discovery request)
+CRC 2 Bytes (can be set to 0 for this assignment)
+
+Optimized Discovery Response Structure:
+
+Network 2 Bytes (mandatory)
+Group ID 2 Bytes
+Combined Sender ID and Message Type 1 Byte (5 Bits for Sender Id and 3 Bits for Message Type)
+Receiver ID 1 Byte
+CRC 2 Bytes (can be set to 0 for this assignment)
+
+*/
+
 fsm Find_Reciever{
 	address packet;
 	address response;
@@ -127,6 +172,8 @@ fsm Find_Reciever{
 	byte request_number;
 	byte msg_type;
 	byte sender_id;
+	byte response_type = 1; // Message type for discovery response
+	byte request_type = 0; // Message type for discovery request
 	int i;
 
 	state Wait_Message:
@@ -136,8 +183,10 @@ fsm Find_Reciever{
 
 		// first 2 bytes is network id, next 2 bytes are group id, next byte is message type, next byte is random value, next is sender id
 		packet_group = ((byte)read_packet[0] << 8) | (byte)read_packet[1];
-		msg_type = read_packet[2];
-		sender_id = read_packet[4];
+		byte type_sender = read_packet[2];
+		msg_type = (type_sender >> 5) & 0x07;
+		sender_id = type_sender & 0x1F;
+		request_number = read_packet[3];
 
 		// Two different messages can be recieved, one is by other nodes
 		// Attempting to find neighbors, the other is from neighbors
@@ -156,7 +205,8 @@ fsm Find_Reciever{
 
 		// Ignores other messages
 		tcv_endp(packet);
-		wait(100, Wait_Message);
+		delay(100, Wait_Message);
+		release;
 	
 	state Discovery_Request:
 		// if group id matches and sender id is not this node, send response
@@ -165,7 +215,8 @@ fsm Find_Reciever{
 			proceed Send_Discovery_Response;
 		}
 		// Otherwise ignore the message
-		else{
+		else
+		{
 			tcv_endp(packet);
 			proceed Wait_Message;
 		}
@@ -199,10 +250,12 @@ fsm Find_Reciever{
 
 		*write_packet++ = (group_ID >> 8) & 0xFF;   // Group ID high
 		*write_packet++ = group_ID & 0xFF;          // Group ID low
-		*write_packet++ = 1;                        // Type = 1 (Discovery Response)
+		byte type_sender = (response_type << 5) | (node_ID & 0x1f); // Combine message type and sender ID into one byte
+		*write_packet++ = type_sender;              // Type and Sender ID combined                     
 		*write_packet++ = request_number;           // Echo request number
-		*write_packet++ = node_ID;                  // Sender ID (our ID)
 		*write_packet++ = sender_id;                // Receiver ID (original requester)
+		*write_packet++ = 0;                      // CRC
+		*write_packet++ = 0;                      // CRC
 
 		tcv_endp(response);
 		proceed Wait_Message;
@@ -403,17 +456,31 @@ fsm root
 	
 	
 	state Menu_Print:
-		ser_outf(Menu_Print, "\r\nGroup%d Device #%d (%d/%d records)", group_ID, node_ID, stored_records, 40);
+		ser_outf(Menu_Print, "\r\nGroup %d Device #%d (%d/%d records)", group_ID, node_ID, stored_records, 40);
 		proceed Menu_Print2;
 	state Menu_Print2:
-		ser_out(Menu_Print2, "\r\n(G)roup ID\r\n(N)ew device ID\r\n(F)ind neighbour\r\n(R)etrieve record from neighbour\r\n(S)how local records\r\nR(e)set local storage\r\n\r\nSelection: ");
+		ser_out( Menu_Print2,
+			"\r\n(G)roup ID"
+			"\r\n(N)ew device ID"
+			"\r\n(F)ind neighbour"
+			"\r\n(C)reate record on neighbor"
+			"\r\n(D)elete record on neighbor"
+			"\r\n(R)etrieve record from neighbour"
+			"\r\n(S)how local records"
+			"\r\nR(e)set local storage"
+			"\r\n\r\nSelection: ");
 		proceed Read_Choice;
 	
 	state Read_Choice:
+		choice = '0';
 		// read the user input 
 		ser_inf(Read_Choice, "%c", &choice);
-		proceed Read_Choice_Process;
+		proceed Read_Choice_Print;
 
+	state Read_Choice_Print:
+		ser_outf(Read_Choice_Process, "%c\r\n", choice);
+		proceed Read_Choice_Process;
+	
 	state Read_Choice_Process:
 		
 		// if "G" or "g", state Ask_Group_ID
@@ -468,6 +535,8 @@ fsm root
 		{
 			proceed Menu_Print;
 		}
+
+		release;
 		
 		// Handle states run the corresponding fsm and then 
 		// Run a state to wait for their process to finish
@@ -480,26 +549,30 @@ fsm root
 		proceed Wait_Delete_Finish;
 		
 	state Wait_Delete_Finish:
-		if (delete_finished) {
+		if (delete_finished == 1) {
 			proceed Menu_Print;
 		}
+		else{
+			proceed Wait_Delete_Finish;
+		}
+		release;
 
-		delay(1000, Wait_Delete_Finish);
-	
 	state Handle_Find:
-		// run the Find protocol
+		// run the delete protocol
 		find_complete = 0;
 		runfsm Find;
-
-		proceed Wait_Find_Complete;
-	
-	state Wait_Find_Complete:
-		if (find_complete) {
+		proceed Wait_Find_Finish;
+		
+	state Wait_Find_Finish:
+		if (find_complete == 1) {
 			proceed Menu_Print;
 		}
+		delay(100, Wait_Find_Loop);
+	state Wait_Find_Loop:
+		proceed Wait_Find_Finish;
 
-		delay(1000, Wait_Find_Complete);
 	
+		
 		// NEW GROUP ID
 	state Ask_Group_ID:
 		// ask for group ID 
@@ -509,7 +582,7 @@ fsm root
 		ser_inf(Ask_Group_ID_In, "%d", (int*)&group_ID);
 		proceed Group_Id_Finish;
 	state Group_Id_Finish:
-		ser_outf(Group_Id_Finish, "%d\r\n\r\n", &group_ID);
+		ser_outf(Group_Id_Finish, "%d\r\n\r\n", group_ID);
 		proceed Menu_Print;
 
 		// NEW NODE ID
@@ -521,7 +594,7 @@ fsm root
 		ser_inf(Ask_Node_ID_In, "%d", (int*)&node_ID);
 		proceed Node_Id_Finish;
 	state Node_Id_Finish:
-		ser_outf(Node_Id_Finish, "%d\r\n\r\n", &node_ID);
+		ser_outf(Node_Id_Finish, "%d\r\n\r\n", node_ID);
 		proceed Menu_Print;
 		
 	state Show_LocalDB:
