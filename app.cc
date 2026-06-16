@@ -221,7 +221,7 @@ fsm Receiver{
 		proceed SEND_DELETE_RESPONSE;
 	
 	state SEND_DELETE_RESPONSE:
-		response = tcv_wnp(SENDER_DELETE_RESPONSE, sfd, 11); // 11 from main + arg + 4
+		response = tcv_wnp(SEND_DELETE_RESPONSE, sfd, 11); // 11 from main + arg + 4
 
 		response[0] = 0;
 		q = (char *)(response + 1);
@@ -233,6 +233,69 @@ fsm Receiver{
 		*q++ = node_ID;
 		*q++ = sender_ID;
 		*q++ = status;
+
+		tcv_endp(response);
+		proceed RECEIVE;
+	
+	state HANDLE_RETRIEVE:
+		arg = p[6]; // get the index you try to retrieve
+
+		// accessing out of bound or empty record
+		if (arg >= 40 || database[arg].used == 0){
+			status = STATUS_RET_EMPTY; // empty status
+		}
+		else{ // if valid record set status to OK
+			status = STATUS_OK;
+		}
+
+		tcv_endp(packet);
+
+		// if valid record is found, go to state where it sends the record
+		if (status == STATUS_OK){
+			proceed SEND_RETRIEVE_OK_RESP;
+		}
+		// if no record is found, go to state where it sends fail response
+		else{
+			proceed SEND_RETRIEVE_FAIL_RESP;
+		}
+
+	state SEND_RETRIEVE_OK_RESP:
+		response = tcv_wnp(SEND_RETRIEVE_OK_RESP, sfd, 31);
+		// 31 from main + status + record[20] + 4
+		// main = group, type, req, sender, receiver
+		response[0] = 0;
+		q = (char *)(response + 1);
+
+		*q++ = (group_ID >> 8) & 0xFF;
+		*q++ = group_ID & 0xFF;
+		*q++ = TYPE_RESPONSE;
+		*q++ = request_num;
+		*q++ = node_ID;
+		*q++ = sender_ID;
+		*q++ = STATUS_OK; // ok status to response
+
+		// put the record to packet
+		for (int i=0; i < 20; i++){
+			*q++ = database[arg].record[i];
+		}
+
+		tcv_endp(response);
+		proceed RECEIEVE;
+
+	state SEND_RETRIEVE_FAIL_RESP:
+		response = tcv_wnp(SEND_RETRIEVE_FAIL_RESP, sfd, 11);
+		// 11 from main + arg + 4
+
+		response[0] = 0;
+		q = (char *)(response + 1);
+
+		*q++ = (group_ID >> 8) & 0xFF;
+		*q++ = group_ID & 0xFF;
+		*q++ = TYPE_RESPONSE;
+		*q++ = request_num;
+		*q++ = node_ID;
+		*q++ = sender_ID;
+		*q++ = STATUS_RETRIEVE_FAIL; // retrieve fail to response
 
 		tcv_endp(response);
 		proceed RECEIVE;
