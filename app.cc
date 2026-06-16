@@ -125,6 +125,42 @@ fsm Receiver{
 				proceed RECEIVE;
 			}
 
+			// handle create request
+			state HANDLE_CREATE:
+				int temp_create = -1;
+
+				// find an empty slot in the database
+				for (int i =0; i < 40; i++){
+					if (database[i].used == 0){
+						temp_create = i;
+						break;
+					}
+				}
+
+				if (temp_create < 0){ // if no empty slots in database
+					status = STATUS_DB_FULL;
+				}
+				else{ // if available slot in database
+					// set record params
+					database[temp_create].used = 1;
+					database[temp_create].owner_id = sender_id;
+					database[temp_create].timestamp = seconds();
+
+					// write record in database
+					// p[0..6] = group, type, req, sender, receiver.
+					for (int i = 0; i < 20; i++){
+						database[temp_create].record[i] = p[6 + i]; // 6 from offset for record in packet
+					}
+
+					// set null terminator in message
+					database[temp_create].record[20 - 1] = '\0';
+
+					stored_records++;
+					status = STATUS_OK;
+				}
+				tcv_endp(packet);
+				proceed SEND_CREATE_RESPONSE;
+			
 			
 }
 
