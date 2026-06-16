@@ -13,8 +13,8 @@
 
 int sfd = -1; //session descriptor 
 
-int node_ID;
-int group_ID;
+byte node_ID[1] = {0}; //initial node ID is 0, stored as an array for easy packet writing
+byte group_ID[2] = {0}; //initial group ID is 0, stored as an array for easy packet writing
 int stored_records;
 int max_records;
 byte delete_request_num;
@@ -26,6 +26,9 @@ byte delete_response_status;
 byte find_neighbors[20]; //array for neighbor id's
 int find_neighbor_count;
 int find_iteration;
+int find_complete = 0;
+
+int delete_finished = 0;
 
 //record structure
 struct Record{
@@ -55,8 +58,7 @@ fsm Find{
 	// Then print the results once complete
 	address packet;
 	char *read_packet;
-	int find_neighbor_count;
-	int find_iteration;
+	int neighbor_print_index;
 
 	state Reset_Neighbors:
 		// For resetting neighbor list
@@ -69,16 +71,16 @@ fsm Find{
 		// Create a discovery request
 		packet = tcv_wnp(Send_Discovery_Request, sfd, 8);
 		packet[0] = 0; //Network ID
-		read_packet = (char *)(packet + 1);
+		packet[1] = 0; //Padding for network ID
+		read_packet = (char *)(packet + 2);
 
-		//packet format: Group ID 2 bytes / message type 1 byte / padding
-		*read_packet++ = (group_ID >> 8) & 0xFF;
-		*read_packet++ = group_ID & 0xFF;
-		*read_packet++ = 1; //message type for discovery request
-		*read_packet++ = 0; //padding
-		*read_packet++ = 0; //padding
-		*read_packet++ = 0; //padding
-		*read_packet++ = 0; //padding
+		//format is Group ID 2 bytes / message type 1 byte / request number 1 byte / sender id 1 byte / receiver id 1 byte / padding
+		*read_packet++ = (group_ID >> 8) & 0xFF;    // Group ID high
+		*read_packet++ = group_ID & 0xFF;           // Group ID low
+		*read_packet++ = 0;                         // Type = 0 (Discovery Request)
+		*read_packet++ = (byte)rnd();               // Request Number (random)
+		*read_packet++ = node_ID;                   // Sender ID
+		*read_packet++ = 0;                         // Receiver ID = 0 (broadcast)
 
 		tcv_endp(packet);
 		proceed Wait_For_Responses;
@@ -90,20 +92,30 @@ fsm Find{
 	state Check_Responses:
 		//checks whether 2 iterations
 		if (find_iteration >= 2) {
-			proceed Print_Neighbors;
+			proceed Print_Neighbors_Header;
 		}
 
 		proceed Send_Discovery_Request;
 	
-	state Print_Neighbors:
+	state Print_Neighbors_Header:
 		// print list following format
 		// “\r\n Neighbors: [Listof Neighbors]” 
 		// where [List of Neighbors] should be replaced by the neighbors’ IDs.
-		ser_outf(Print_Neighbors, "\r\n Neighbors: ");
-		for (int i = 0; i < find_neighbor_count; i++) {
-			ser_outf(Print_Neighbors, "%d ", find_neighbors[i]);
+		neighbor_print_index = 0;
+		ser_outf(Print_Neighbors_Header, "\r\n Neighbors: ");
+		proceed Print_Neighbor_Item;
+
+	state Print_Neighbor_Item:
+		if (neighbor_print_index >= find_neighbor_count) {
+			proceed Finish_Find;
 		}
-		finish; 
+		ser_outf(Print_Neighbor_Item, "%d ", find_neighbors[neighbor_print_index]);
+		neighbor_print_index++;
+		proceed Print_Neighbor_Item;
+
+	state Finish_Find:
+		find_complete = 1;
+		finish;
 }
 
 fsm Find_Reciever{
@@ -111,17 +123,18 @@ fsm Find_Reciever{
 	address response;
 	char *read_packet;
 	char *write_packet;
-	int packet_group;
-	byte msg_type;
-	byte sender_id;
+	byte packet_group[1];
+	byte request_number[1];
+	byte msg_type[1];
+	byte sender_id[1];
 	int i;
 
 	state Wait_Message:
 		//recieve packets
 		packet = tcv_rnp(Wait_Message, sfd);
-		read_packet = (char *)(packet + 1);
+		read_packet = (char *)(packet + 2);
 
-		// first byte is network id, next 2 bytes are group id, next byte is message type, next byte is sender id
+		// first 2 bytes is network id, next 2 bytes are group id, next byte is message type, next byte is random value, next is sender id
 		packet_group = ((byte)read_packet[0] << 8) | (byte)read_packet[1];
 		msg_type = read_packet[2];
 		sender_id = read_packet[4];
@@ -132,18 +145,18 @@ fsm Find_Reciever{
 		// how we handle the message
 
 		// discovery request
-		if (msg_type == 1) {
+		if (msg_type == 0) {
 			proceed Discovery_Request;
 		}
 
 		// discovery response (only in find fsm)
-		if (msg_type == 2) {
+		if (msg_type == 1) {
 			proceed Discovery_Response;
 		}
 
 		// Ignores other messages
 		tcv_endp(packet);
-		proceed Wait_Message;
+		wait(100, Wait_Message);
 	
 	state Discovery_Request:
 		// if group id matches and sender id is not this node, send response
@@ -181,16 +194,15 @@ fsm Find_Reciever{
 		// Format Group ID 2 bytes / message type 1 byte / sender id 1 byte / padding
 		response = tcv_wnp(Send_Discovery_Response, sfd, 8);
 		response[0] = 0; //Network ID
-		write_packet = (char *)(response + 1);
+		response[1] = 0; //Padding for network ID
+		write_packet = (char *)(response + 2);
 
-		*write_packet++ = (group_ID >> 8) & 0xFF;
-		*write_packet++ = group_ID & 0xFF;
-		*write_packet++ = 2; //message type for discovery response
-		*write_packet++ = node_ID; //sender id
-		*write_packet++ = 0; //padding
-		*write_packet++ = 0; //padding
-		*write_packet++ = 0; //padding
-		*write_packet++ = 0; //padding
+		*write_packet++ = (group_ID >> 8) & 0xFF;   // Group ID high
+		*write_packet++ = group_ID & 0xFF;          // Group ID low
+		*write_packet++ = 1;                        // Type = 1 (Discovery Response)
+		*write_packet++ = request_number;           // Echo request number
+		*write_packet++ = node_ID;                  // Sender ID (our ID)
+		*write_packet++ = sender_id;                // Receiver ID (original requester)
 
 		tcv_endp(response);
 		proceed Wait_Message;
@@ -205,11 +217,17 @@ fsm Delete{
 	//prompts the user for the destination node ID to delete
 	state Ask_Destination_ID:
 		ser_out(Ask_Destination_ID, "Destination node ID: ");
-		ser_inf(Ask_Destination_ID, "%d", &destination_id);
+		proceed Ask_Destination_ID_In;
+	state Ask_Destination_ID_In:
+		ser_inf(Ask_Destination_ID_In, "%d", &destination_id);
+		proceed Ask_Record_Index;
 	//prompts the user of the record index to delete
 	state Ask_Record_Index:
 		ser_out(Ask_Record_Index, "Enter record index: ");
-		ser_inf(Ask_Record_Index, "%d", &record_index);
+		proceed Ask_Record_Index_In;
+	state Ask_Record_Index_In:
+		ser_inf(Ask_Record_Index_In, "%d", &record_index);
+		proceed Send_delete_request;
 	//prepares the delete request packet
 	state Send_delete_request:
 		//prepares the delete operation
@@ -238,6 +256,7 @@ fsm Delete{
 		*read_packet++ = 0;
 		
 		tcv_endp(packet);
+		proceed Wait_Response;
 	
 	
 	//waits for a response from the destination node
@@ -254,17 +273,20 @@ fsm Delete{
 		}
 
 		ser_out(Timeout, "\r\nFailed to reach the destination");
+		delete_finished = 1;
 		finish;
 	//prints the results
 	state Print_Result:
 		if (delete_response_status == 0x01){
-			ser_out(Timeout, "\r\nRecord deleted");
+			ser_out(Print_Result, "\r\nRecord deleted");
 		}
 		else{
-			ser_outf(Timeout, "\r\nThe record does not exit on node %d", delete_destination_id);
+			ser_outf(Print_Result, "\r\nThe record does not exit on node %d", delete_destination_id);
 		}
+		delete_finished = 1;
 		finish;
 }
+
 fsm Delete_Receiver{
 	address packet;
 	address response;
@@ -409,7 +431,7 @@ fsm root
 		// if "F", run Find protocol
 		else if ((choice == 'F') || (choice == 'f'))
 		{
-			runfsm Find; // change to match fsm name if different
+			proceed Handle_Find;
 		}
 		
 		// if "C, run Create protocol
@@ -421,7 +443,7 @@ fsm root
 		// if "D", run Delete protocol
 		else if ((choice == 'D') || (choice == 'd'))
 		{
-			runfsm Delete;
+			proceed Delete_Handle;
 		}
 		
 		// if "R", run the Retrieve protocol
@@ -447,41 +469,88 @@ fsm root
 			proceed Menu_Print;
 		}
 		
+		// Handle states run the corresponding fsm and then 
+		// Run a state to wait for their process to finish
+		// Follows by displaying menu again
+
+	state Handle_Delete:
+		// run the delete protocol
+		delete_finished = 0;
+		runfsm Delete;
+		proceed Wait_Delete_Finish;
 		
-		
-		
+	state Wait_Delete_Finish:
+		if (delete_finished) {
+			proceed Menu_Print;
+		}
+
+		delay(1000, Wait_Delete_Finish);
+	
+	state Handle_Find:
+		// run the Find protocol
+		find_complete = 0;
+		runfsm Find;
+
+		proceed Wait_Find_Complete;
+	
+	state Wait_Find_Complete:
+		if (find_complete) {
+			proceed Menu_Print;
+		}
+
+		delay(1000, Wait_Find_Complete);
+	
+		// NEW GROUP ID
 	state Ask_Group_ID:
 		// ask for group ID 
-		 
 		ser_out(Ask_Group_ID, "Enter Group ID: ");
-		
-		// update node group ID 
-		
-		
-		// show the menu again 
+		proceed Ask_Group_ID_In;
+	state Ask_Group_ID_In:
+		ser_inf(Ask_Group_ID_In, "%d", &group_ID);
+		proceed Group_Id_Finish;
+	state Group_Id_Finish:
+		ser_outf("%d\r\n\r\n", &group_ID);
 		proceed Menu_Print;
-		
-	
+
+		// NEW NODE ID
 	state Ask_Node_ID:
 		// ask for Node ID 
 		ser_out(Ask_Node_ID, "Enter Node ID: ");
-		
-		//update node ID
-		
-		
-		// show the menu 
+		proceed Ask_Node_ID_In;
+	state Ask_Node_ID_In:
+		ser_inf(Ask_Node_ID_In, "%d", &node_ID);
+		proceed Node_Id_Finish;
+	state Node_Id_Finish:
+		ser_outf("%d\r\n\r\n", &node_ID);
 		proceed Menu_Print;
-		
-		
-	state Read_Node:
-		// reads from the specified node given by user
 		
 	state Show_LocalDB:
 		// user chose "S" or "s", 
 		// format: index    Time Stamp     owner ID     Record Data
+		db_print_index = 0;
+		ser_out(Show_LocalDB, "\r\nIndex\tTime Stamp\tOwner ID\tRecord Data\r\n");
+		proceed Show_LocalDB_Item;
+	state Show_LocalDB_Item:
+		// Prints one single line for each entry	
+		if (db_print_index >= max_records) {
+			ser_out("\r\n");
+			proceed Menu_Print;
+		}
+		ser_outf(Show_LocalDB_Item, "%d\t%d\t%d\t%s\r\n", db_print_index, database[db_print_index].timestamp, database[db_print_index].owner_id, database[db_print_index].record);
+		db_print_index++;
+		proceed Show_LocalDB_Item;
 	
 	
 	state Reset_DB:
 		// user chose "E" or "e", delete all the nodes 
+		stored_records = 0;
+		for (int i = 0; i < 40; i++) {
+			database[i].used = 0;
+			database[i].owner_id = 0;
+			database[i].timestamp = 0;
+			database[i].record[0] = '\0';
+		}
+		ser_out("\r\n");
+		proceed Menu_Print;
 }
 
