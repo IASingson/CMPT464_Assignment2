@@ -375,15 +375,24 @@ fsm root
 			halt();
 		}
 		runfsm Delete_Receiver;
+		runfsm Find_Reciever;
+
+		proceed Menu_Print;
 	
 	
 	state Menu_Print:
 		ser_outf(Menu_Print, "\r\nGroup%d Device #%d (%d/%d records)", group_ID, node_ID, stored_records, 40);
-		ser_out(Menu_Print, "(G)roup ID\r\n(N)ew device ID\r\n(F)ind neighbour\r\n(R)etrieve record from neighbour\r\n(S)how local records\r\nR(e)set local storage\r\n\r\nSelection: ");
+		proceed Menu_Print2;
+	state Menu_Print2:
+		ser_out(Menu_Print2, "\r\n(G)roup ID\r\n(N)ew device ID\r\n(F)ind neighbour\r\n(R)etrieve record from neighbour\r\n(S)how local records\r\nR(e)set local storage\r\n\r\nSelection: ");
+		proceed Read_Choice;
 	
 	state Read_Choice:
 		// read the user input 
 		ser_inf(Read_Choice, "%d", &temp);
+		proceed Read_Choice_Process;
+
+	state Read_Choice_Process:
 		
 		// if "G" or "g", state Ask_Group_ID
 		if ((choice == 'G') || (choice == 'g'))
