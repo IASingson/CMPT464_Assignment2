@@ -389,7 +389,7 @@ fsm root
 	
 	state Read_Choice:
 		// read the user input 
-		ser_inf(Read_Choice, "%d", &temp);
+		ser_inf(Read_Choice, "%c", &choice);
 		proceed Read_Choice_Process;
 
 	state Read_Choice_Process:
