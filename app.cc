@@ -161,6 +161,23 @@ fsm Receiver{
 				tcv_endp(packet);
 				proceed SEND_CREATE_RESPONSE;
 			
+			state SEND_CREATE_RESPONSE:
+				response = tcv_wnp(SEND_CREATE_RESPONSE, sfd, 11); // 11 from main + arg + 4 (6 + 1 + 4); 4 from netword id and CRC
+				
+				response[0] = 0;
+				q = (char *)(response + 1);
+
+				*q++ = (group_ID >> 8) & 0xFF;
+				*q++ = group_ID & 0xFF;
+				*q++ = TYPE_RESPONSE;
+				*q++ = request_numb;
+				*q++ = node_ID;
+				*q++ = sender_ID;
+				*q++ = status;
+				
+				tcv_endp(response);
+				proceed RECEIVE;
+			
 			
 }
 
