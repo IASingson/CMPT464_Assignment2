@@ -36,6 +36,11 @@ byte delete_destination_id;
 byte delete_response_received;
 byte delete_response_status;
 
+byte pending_req;
+byte pending_dest;
+byte pending_type;
+byte pending_active;
+
 // following used for Find protocols
 byte find_neighbors[20]; //array for neighbor id's
 int find_neighbor_count;
@@ -45,6 +50,7 @@ int delete_finished = 0;
 int create_finished = 0;
 int retrieve_finished = 0;
 
+int destination_id;
 
 byte find_req_num = 0;
 byte find_active = 0;
@@ -118,24 +124,24 @@ fsm Create{
 
 	 state SEND_CREATE:
         pending_req = (byte)rnd();
-        pending_dest = (byte)destination_id;
+        pending_destination_id = (byte)destination_id;
         pending_type = MSG_TYPE_CREATE;
         pending_active = 1;
 
         reply_received = 0;
         reply_status = 0;
 
-        packet = tcv_wnp(SEND_CREATE, sfd, PKT_CREATE);
+        packet = tcv_wnp(SEND_CREATE, sfd, 7);
 
         packet[0] = 0;
-        p = (char *)(packet + 1);
+        p = (char *)(packet);
 
         *p++ = (group_ID >> 8) & 0xFF;
         *p++ = group_ID & 0xFF;
         *p++ = MSG_TYPE_CREATE;
         *p++ = pending_req;
         *p++ = node_ID;
-        *p++ = pending_dest;
+        *p++ = pending_destination_id;
 
 		// no status or index here so skip 'arg' field
         for (i = 0; i < 20; i++) {
@@ -168,14 +174,14 @@ fsm Create{
     state GOT_RESPONSE:
         pending_active = 0;
 
-        if (reply_status == STATUS_OK) {
+        if (reply_status == STATUS_SUCCESS) {
             ser_out(GOT_RESPONSE, "\r\n Data Saved");
         } else {
             ser_outf(GOT_RESPONSE,
                      "\r\n The record can't be saved on node %d",
-                     pending_dest);
+                     pending_destination_id);
         }
-		create_finshed = 1;
+		create_finished = 1;
         finish;
 }
 
@@ -215,7 +221,7 @@ fsm Retrieve {
 
     state SEND_RETRIEVE:
         pending_req = (byte)rnd();
-        pending_dest = (byte)dest_id;
+        pending_destination_id = (byte)dest_id;
         pending_type = MSG_TYPE_RETRIEVE;
         pending_active = 1;
 
@@ -223,7 +229,7 @@ fsm Retrieve {
         reply_status = 0;
         reply_record[0] = '\0';
 
-        packet = tcv_wnp(SEND_RETRIEVE, sfd, PKT_ARG);
+        packet = tcv_wnp(SEND_RETRIEVE, sfd, 8);
 
         packet[0] = 0;
         p = (char *)(packet + 1);
@@ -233,7 +239,7 @@ fsm Retrieve {
         *p++ = MSG_TYPE_RETRIEVE;
         *p++ = pending_req;
         *p++ = node_ID;
-        *p++ = pending_dest;
+        *p++ = pending_destination_id;
         *p++ = (byte)record_index;
 
         tcv_endp(packet);
@@ -261,15 +267,15 @@ fsm Retrieve {
     state GOT_RESPONSE:
         pending_active = 0;
 
-        if (reply_status == STATUS_OK) {
+        if (reply_status == STATUS_SUCCESS) {
             ser_outf(GOT_RESPONSE,
                      "\r\n Record Received from %d: %s",
-                     pending_dest,
+                     pending_destination_id,
                      reply_record);
         } else {
             ser_outf(GOT_RESPONSE,
                      "\r\n The record does not exist on node %d",
-                     pending_dest);
+                     pending_destination_id);
         }
 		retrieve_finished = 1;
         finish;
@@ -328,7 +334,7 @@ fsm Receiver{
 				}
 				tcv_endp(packet);
 				proceed RECEIVE;
-		}
+			}
 
 		if (packet_group != group_ID || receiver_id != node_ID){
 			tcv_endp(packet);
@@ -370,7 +376,7 @@ fsm Receiver{
 		// 2 +1 +1 +1 +1 + 4; 4 from network id and crc
 		// so 10 total
 
-		response = tcv_wnp(SEND_DISC_RESP, sfd, 10);
+		response = tcv_wnp(SEND_DISC_RESP, sfd, 6);
 
 		response[0] = 0;
 		q = (char *)(response + 1);
@@ -378,15 +384,15 @@ fsm Receiver{
 		*q++ = group_ID & 0xFF;
 		*q++ = request_num;
 		*q++ = node_ID;
-		*q++ = sender_ID;
+		*q++ = sender_id;
 		tcv_endp(response);
 		proceed RECEIVE;
 	
 	state HANDLE_DISC_RESP:
 		if (packet_group == group_ID &&
-			receiver_ID == node_ID &&
+			receiver_id == node_ID &&
 			find_active &&
-			request_num == find_request_num){
+			request_num == find_req_num){
 				found = 0;
 
 				for (i = 0; i < find_neighbor_count; i++){
@@ -395,14 +401,14 @@ fsm Receiver{
 						break;
 					}
 				}
-			}
-			if (!found && find_neighbor_count < 20){
-				find_neighbors[find_neighbor_count] == sender_id;
-				find_neighbor_cound++;
-			}
+		}
+		if (!found && find_neighbor_count < 20){
+			find_neighbors[find_neighbor_count] == sender_id;
+			find_neighbor_count++;
 		}
 		tcv_endp(packet);
 		proceed RECEIVE;
+	
 	// handle create request
 	state HANDLE_CREATE:
 		temp_create = -1;
@@ -850,7 +856,7 @@ fsm root
 			proceed Menu_Print;
 		}
 		else{
-			proced Wait_Retrieve_Finish;
+			proceed Wait_Retrieve_Finish;
 		}
 		release;
 		
