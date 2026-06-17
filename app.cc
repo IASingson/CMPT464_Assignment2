@@ -318,11 +318,11 @@ fsm Receiver{
 	
 	state PROCESS:
 		p = (char *)(packet + 1);
-		packet_group = (((int)((byte)p[0])) << 8) | ((int)((byte)p[1]));
-		msg_type = p[2];
-		request_num = p[3];
-		sender_id = p[4];
-		receiver_id = p[5];
+		packet_group = (((int)((byte)p[0])) << 8) | ((int)((byte)p[1]));  // Group ID from bytes 0-1
+		msg_type = p[2];           // Message type from byte 2
+		request_num = p[3];        // Request number from byte 3
+		sender_id = p[4];          // Sender ID from byte 4
+		receiver_id = p[5];        // Receiver ID from byte 5
 		
 		// now determine how to handle the message based on the type
 		if (msg_type == MSG_TYPE_RESPONSE){
@@ -755,6 +755,7 @@ fsm root
 		retrieve_finished = 0;
 
 		runfsm Receiver;
+		//runfsm Find_Receiver;
 
 		proceed Menu_Print;
 	
