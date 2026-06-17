@@ -110,19 +110,12 @@ fsm Create{
 		proceed READ_RECORD;
 
 	state READ_RECORD:
-		ser_in(READ_RECORD, record_data, 20 - 1); // max 19 char + \0
-
-		for (i = 0; i < 20; i++){
-			if (record_data[i] == '\r' || record_data[i] == '\n'){
-				record_data[i] = '\0';
-				break;
-			}
-		}
-		record_data[19] = '\0';
+		ser_inf(READ_RECORD, "%c\r\n", record_data);
 
 		proceed SEND_CREATE;
 
 	 state SEND_CREATE:
+		ser_outf(SEND_CREATE, "%c", record_data);
         pending_req = (byte)rnd();
         pending_destination_id = (byte)destination_id;
         pending_type = MSG_TYPE_CREATE;
@@ -767,7 +760,7 @@ fsm root
 		proceed Read_Choice_Print;
 
 	state Read_Choice_Print:
-		ser_outf(Read_Choice_Process, "%c\r\n", choice);
+		ser_outf(Read_Choice_Print, "%c\r\n", choice);
 		proceed Read_Choice_Process;
 	
 	state Read_Choice_Process:
@@ -842,7 +835,7 @@ fsm root
 			proceed Menu_Print;
 		}
 		else{
-			proceed Wait_Delete_Finish;
+			delay(100, Wait_Create_Finish);		
 		}
 		release;
 	
