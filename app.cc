@@ -41,8 +41,13 @@ byte find_neighbors[20]; //array for neighbor id's
 int find_neighbor_count;
 int find_iteration;
 int find_complete = 0;
-
 int delete_finished = 0;
+int create_finished = 0;
+int retrieve_finished = 0;
+
+
+byte find_req_num = 0;
+byte find_active = 0;
 
 // pending
 // usedd for keeping track of requests that we have sent and are waiting for a response for, used in both delete and retrieve protocols
@@ -67,12 +72,207 @@ struct Record database[40];
 
 //temp for testing
 fsm Create{
-	state Skip:
-		finish;
+	address packet;
+	char *p;
+
+	int dest_id;
+	char record_data[20];
+
+	int i;
+	
+
+	state ASK_DEST:
+		ser_out(ASK_DEST, "\r\nDestination node ID: ");
+		proceed READ_DEST;
+
+	state READ_DEST:
+		ser_inf(READ_DEST, "%d", &dest_id);
+
+		if (dest_id < 1|| dest_id > 25){
+			ser_out(READ_DEST, "\r\nInvalid destination node ID");
+			finish;
+		}
+
+		for (i = 0; i < 20; i++){
+			record_data[i] = '\0';
+		}
+
+		proceed ASK_RECORD;
+
+	state ASK_RECORD:
+		ser_out(ASK_RECORD, "\r\nRecord string: ");
+		proceed READ_RECORD;
+
+	state READ_RECORD:
+		ser_in(READ_RECORD, record_data, 20 - 1); // max 19 char + \0
+
+		for (i = 0; i < 20; i++){
+			if (record_data[i] == '\r' || record_data[i] == '\n'){
+				record_data[i] = '\0';
+				break;
+			}
+		}
+		record_data[19] = '\0';
+
+		proceed SEND_CREATE;
+
+	 state SEND_CREATE:
+        pending_req = (byte)rnd();
+        pending_dest = (byte)destination_id;
+        pending_type = MSG_TYPE_CREATE;
+        pending_active = 1;
+
+        reply_received = 0;
+        reply_status = 0;
+
+        packet = tcv_wnp(SEND_CREATE, sfd, PKT_CREATE);
+
+        packet[0] = 0;
+        p = (char *)(packet + 1);
+
+        *p++ = (group_ID >> 8) & 0xFF;
+        *p++ = group_ID & 0xFF;
+        *p++ = MSG_TYPE_CREATE;
+        *p++ = pending_req;
+        *p++ = node_ID;
+        *p++ = pending_dest;
+
+		// no status or index here so skip 'arg' field
+        for (i = 0; i < 20; i++) {
+            *p++ = record_data[i];
+        }
+
+        tcv_endp(packet);
+		proceed WAIT_RESPONSE;
+
+    state WAIT_RESPONSE:
+        if (reply_received) {
+            proceed GOT_RESPONSE;
+        }
+
+        delay(3000, TIMEOUT);
+        release;
+		proceed TIMEOUT;
+
+	// do we need this tho?
+    state TIMEOUT:
+        if (reply_received) {
+            proceed GOT_RESPONSE;
+        }
+
+        pending_active = 0;
+        ser_out(TIMEOUT, "\r\nFailed to reach the destination");
+		create_finished = 1;
+        finish;
+
+    state GOT_RESPONSE:
+        pending_active = 0;
+
+        if (reply_status == STATUS_OK) {
+            ser_out(GOT_RESPONSE, "\r\n Data Saved");
+        } else {
+            ser_outf(GOT_RESPONSE,
+                     "\r\n The record can't be saved on node %d",
+                     pending_dest);
+        }
+		create_finshed = 1;
+        finish;
 }
-fsm Retrieve{
-	state Skip:
-		finish;
+
+fsm Retrieve {
+    address packet;
+    char *p;
+
+    int dest_id;
+    int record_index;
+
+    state ASK_DEST:
+        ser_out(ASK_DEST, "\r\nDestination node ID: ");
+		proceed READ_DEST;
+
+    state READ_DEST:
+        ser_inf(READ_DEST, "%d", &dest_id);
+
+		// invalid dest id
+        if (dest_id < 1 || dest_id > 25) {
+            ser_out(READ_DEST, "\r\nInvalid destination node ID");
+            finish;
+        }
+		proceed ASK_INDEX;
+		
+    state ASK_INDEX:
+        ser_out(ASK_INDEX, "\r\nEnter record index: ");
+		proceed READ_INDEX;
+
+    state READ_INDEX:
+        ser_inf(READ_INDEX, "%d", &record_index);
+
+        if (record_index < 0 || record_index >= 40) {
+            ser_out(READ_INDEX, "\r\nInvalid record index");
+            finish;
+        }
+		proceed SEND_RETRIEVE;
+
+    state SEND_RETRIEVE:
+        pending_req = (byte)rnd();
+        pending_dest = (byte)dest_id;
+        pending_type = MSG_TYPE_RETRIEVE;
+        pending_active = 1;
+
+        reply_received = 0;
+        reply_status = 0;
+        reply_record[0] = '\0';
+
+        packet = tcv_wnp(SEND_RETRIEVE, sfd, PKT_ARG);
+
+        packet[0] = 0;
+        p = (char *)(packet + 1);
+
+        *p++ = (group_ID >> 8) & 0xFF;
+        *p++ = group_ID & 0xFF;
+        *p++ = MSG_TYPE_RETRIEVE;
+        *p++ = pending_req;
+        *p++ = node_ID;
+        *p++ = pending_dest;
+        *p++ = (byte)record_index;
+
+        tcv_endp(packet);
+		proceed WAIT_RESPONSE;
+
+    state WAIT_RESPONSE:
+        if (reply_received) {
+            proceed GOT_RESPONSE;
+        }
+
+        delay(3000, TIMEOUT);
+        release;
+		proceed TIMEOUT;
+
+    state TIMEOUT:
+        if (reply_received) {
+            proceed GOT_RESPONSE;
+        }
+
+        pending_active = 0;
+        ser_out(TIMEOUT, "\r\nFailed to reach the destination");
+		retrieve_finished = 1;
+        finish;
+
+    state GOT_RESPONSE:
+        pending_active = 0;
+
+        if (reply_status == STATUS_OK) {
+            ser_outf(GOT_RESPONSE,
+                     "\r\n Record Received from %d: %s",
+                     pending_dest,
+                     reply_record);
+        } else {
+            ser_outf(GOT_RESPONSE,
+                     "\r\n The record does not exist on node %d",
+                     pending_dest);
+        }
+		retrieve_finished = 1;
+        finish;
 }
 
 fsm Receiver{
@@ -90,13 +290,17 @@ fsm Receiver{
 	byte arg;
 	byte status;
 
+	int i;
+	int temp_create;
+	int found;
+
 	state RECEIVE:
-		packet = tcv_rnp(Receive, sfd);
-		proceed Process;
+		packet = tcv_rnp(RECEIVE, sfd);
+		proceed PROCESS;
 	
 	state PROCESS:
 		p = (char *)(packet + 1);
-		packet_group = ((((int)(byte))p[0]) << 8) | ((int)(byte))p[1];
+		packet_group = (((int)((byte)p[0])) << 8) | ((int)((byte)p[1]));
 		msg_type = p[2];
 		request_num = p[3];
 		sender_id = p[4];
@@ -106,17 +310,18 @@ fsm Receiver{
 		if (msg_type == MSG_TYPE_RESPONSE){
 			status = p[6]; // for response messages, the 7th byte is the status of the operation
 
-			if (packet_group == group_ID &&
-				receiver_id == node_ID &&
-				pending_active &&
-				sender_id == pending_destination_id &&
-				request_num == pending_request_num) {
-					reply_status = status;
+			if (packet_group == group_ID &&  // check if packet from same group
+				receiver_id == node_ID && // check if packet intended for receiver
+				pending_active && // check if we are expecting a packet to come
+				sender_id == pending_destination_id && // check if sender is the same as dest we are expecting
+				request_num == pending_request_num) {// check if the request number is the same
+					// if all true then
+					reply_status = status; 
 					reply_received = 1;
 
-					if (pending_type == TYPE_RETRIEVE && status == STATUS_OK){
+					if (pending_type == MSG_TYPE_RETRIEVE && status == STATUS_SUCCESS){
 						for (int i=0; i < 20; i++){
-							reply_record[i] = p[7 + i] // 7 for offset for response. 
+							reply_record[i] = p[7 + i]; // 7 for offset for response. 
 						}
 						reply_record[20 - 1] = '\0';
 					}
@@ -129,25 +334,81 @@ fsm Receiver{
 			tcv_endp(packet);
 			proceed RECEIVE;
 		}
-		if (type == TYPE_CREATE){
+		if (msg_type == MSG_TYPE_CREATE){
 			proceed HANDLE_CREATE;
 		}
-		if (type == TYPE_HANDLE){
+		if (msg_type == MSG_TYPE_DELETE){
 			proceed HANDLE_DELETE;
 		}
-		if (type == TYPE_RETRIEVE){
+		if (msg_type == MSG_TYPE_RETRIEVE){
 			proceed HANDLE_RETRIEVE;
+		}
+		if (msg_type == MSG_TYPE_DISC_REQ){
+			proceed HANDLE_DISC_REQ;
+		}
+		if (msg_type == MSG_TYPE_DISC_RESP){
+			proceed HANDLE_DISC_RESP;
 		}
 
 		tcv_endp(packet);
 		proceed RECEIVE;
 
+	state HANDLE_DISC_REQ:
+		// group, type = 0, req-num, sender, rec = 0
+		// we respond only when same group, rec = 0
+		if (packet_group != group_ID || receiver_id !=0){
+			tcv_endp(packet);
+			proceed RECEIVE;
+		}
+		tcv_endp(packet);
+		proceed SEND_DISC_RESP;
+	
+	state SEND_DISC_RESP:
+		// packet struct:
+		// group, type = 1, req_num, sender, rec,
+		// 10 bytes total?
+		// 2 +1 +1 +1 +1 + 4; 4 from network id and crc
+		// so 10 total
+
+		response = tcv_wnp(SEND_DISC_RESP, sfd, 10);
+
+		response[0] = 0;
+		q = (char *)(response + 1);
+		*q++ = (group_ID >> 8) & 0xFF;
+		*q++ = group_ID & 0xFF;
+		*q++ = request_num;
+		*q++ = node_ID;
+		*q++ = sender_ID;
+		tcv_endp(response);
+		proceed RECEIVE;
+	
+	state HANDLE_DISC_RESP:
+		if (packet_group == group_ID &&
+			receiver_ID == node_ID &&
+			find_active &&
+			request_num == find_request_num){
+				found = 0;
+
+				for (i = 0; i < find_neighbor_count; i++){
+					if (find_neighbors[i] == sender_id){
+						found = 1;
+						break;
+					}
+				}
+			}
+			if (!found && find_neighbor_count < 20){
+				find_neighbors[find_neighbor_count] == sender_id;
+				find_neighbor_cound++;
+			}
+		}
+		tcv_endp(packet);
+		proceed RECEIVE;
 	// handle create request
 	state HANDLE_CREATE:
-		int temp_create = -1;
+		temp_create = -1;
 
 		// find an empty slot in the database
-		for (int i =0; i < 40; i++){
+		for (i =0; i < 40; i++){
 			if (database[i].used == 0){
 				temp_create = i;
 				break;
@@ -165,7 +426,7 @@ fsm Receiver{
 
 			// write record in database
 			// p[0..6] = group, type, req, sender, receiver.
-			for (int i = 0; i < 20; i++){
+			for (i = 0; i < 20; i++){
 				database[temp_create].record[i] = p[6 + i]; // 6 from offset for record in packet
 			}
 
@@ -173,7 +434,7 @@ fsm Receiver{
 			database[temp_create].record[20 - 1] = '\0';
 
 			stored_records++;
-			status = STATUS_OK;
+			status = STATUS_SUCCESS;
 		}
 		tcv_endp(packet);
 		proceed SEND_CREATE_RESPONSE;
@@ -186,10 +447,10 @@ fsm Receiver{
 
 		*q++ = (group_ID >> 8) & 0xFF;
 		*q++ = group_ID & 0xFF;
-		*q++ = TYPE_RESPONSE;
-		*q++ = request_numb;
+		*q++ = MSG_TYPE_RESPONSE;
+		*q++ = request_num;
 		*q++ = node_ID;
-		*q++ = sender_ID;
+		*q++ = sender_id;
 		*q++ = status;
 		
 		tcv_endp(response);
@@ -201,7 +462,7 @@ fsm Receiver{
 		// if selected record is out of range
 		// or empty record is selected
 		if (arg >= 40 || database[arg].used == 0){
-			status = STATUS_DEL_EMPTY; // set status
+			status = STATUS_DEL_FAIL; // set status
 		}
 		else{
 			// set database record fields to 0
@@ -215,7 +476,7 @@ fsm Receiver{
 			if (stored_records > 0){
 				stored_records--;
 			}
-			status = STATUS_OK; // successful delete operation
+			status = STATUS_SUCCESS; // successful delete operation
 		}
 		tcv_endp(packet);
 		proceed SEND_DELETE_RESPONSE;
@@ -228,10 +489,10 @@ fsm Receiver{
 
 		*q++ = (group_ID >> 8) & 0xFF;
 		*q++ = group_ID & 0xFF;
-		*q++ = TYPE_RESPONSE;
+		*q++ = MSG_TYPE_RESPONSE;
 		*q++ = request_num;
 		*q++ = node_ID;
-		*q++ = sender_ID;
+		*q++ = sender_id;
 		*q++ = status;
 
 		tcv_endp(response);
@@ -242,16 +503,16 @@ fsm Receiver{
 
 		// accessing out of bound or empty record
 		if (arg >= 40 || database[arg].used == 0){
-			status = STATUS_RET_EMPTY; // empty status
+			status = STATUS_RETRIEVE_FAIL; // empty status
 		}
 		else{ // if valid record set status to OK
-			status = STATUS_OK;
+			status = STATUS_SUCCESS;
 		}
 
 		tcv_endp(packet);
 
 		// if valid record is found, go to state where it sends the record
-		if (status == STATUS_OK){
+		if (status == STATUS_SUCCESS){
 			proceed SEND_RETRIEVE_OK_RESP;
 		}
 		// if no record is found, go to state where it sends fail response
@@ -268,19 +529,19 @@ fsm Receiver{
 
 		*q++ = (group_ID >> 8) & 0xFF;
 		*q++ = group_ID & 0xFF;
-		*q++ = TYPE_RESPONSE;
+		*q++ = MSG_TYPE_RESPONSE;
 		*q++ = request_num;
 		*q++ = node_ID;
-		*q++ = sender_ID;
-		*q++ = STATUS_OK; // ok status to response
+		*q++ = sender_id;
+		*q++ = STATUS_SUCCESS; // ok status to response
 
 		// put the record to packet
-		for (int i=0; i < 20; i++){
+		for (i=0; i < 20; i++){
 			*q++ = database[arg].record[i];
 		}
 
 		tcv_endp(response);
-		proceed RECEIEVE;
+		proceed RECEIVE;
 
 	state SEND_RETRIEVE_FAIL_RESP:
 		response = tcv_wnp(SEND_RETRIEVE_FAIL_RESP, sfd, 11);
@@ -291,10 +552,10 @@ fsm Receiver{
 
 		*q++ = (group_ID >> 8) & 0xFF;
 		*q++ = group_ID & 0xFF;
-		*q++ = TYPE_RESPONSE;
+		*q++ = MSG_TYPE_RESPONSE;
 		*q++ = request_num;
 		*q++ = node_ID;
-		*q++ = sender_ID;
+		*q++ = sender_id;
 		*q++ = STATUS_RETRIEVE_FAIL; // retrieve fail to response
 
 		tcv_endp(response);
@@ -365,96 +626,6 @@ fsm Find{
 	state Finish_Find:
 		find_complete = 1;
 		finish;
-}
-
-fsm Find_Reciever{
-	address packet;
-	address response;
-	char *read_packet;
-	char *write_packet;
-	byte packet_group;
-	byte request_number;
-	byte msg_type;
-	byte sender_id;
-	int i;
-
-	state Wait_Message:
-		//recieve packets
-		packet = tcv_rnp(Wait_Message, sfd);
-		read_packet = (char *)(packet + 2);
-
-		// first 2 bytes is network id, next 2 bytes are group id, next byte is message type, next byte is random value, next is sender id
-		packet_group = ((byte)read_packet[0] << 8) | (byte)read_packet[1];
-		msg_type = read_packet[2];
-		sender_id = read_packet[4];
-
-		// Two different messages can be recieved, one is by other nodes
-		// Attempting to find neighbors, the other is from neighbors
-		// Responding to our discovery request, the message type will determine
-		// how we handle the message
-
-		// discovery request
-		if (msg_type == 0) {
-			proceed Discovery_Request;
-		}
-
-		// discovery response (only in find fsm)
-		if (msg_type == 1) {
-			proceed Discovery_Response;
-		}
-
-		// Ignores other messages
-		tcv_endp(packet);
-		wait(100, Wait_Message);
-	
-	state Discovery_Request:
-		// if group id matches and sender id is not this node, send response
-		if (packet_group == group_ID && sender_id != node_ID) {
-			tcv_endp(packet);
-			proceed Send_Discovery_Response;
-		}
-		// Otherwise ignore the message
-		else{
-			tcv_endp(packet);
-			proceed Wait_Message;
-		}
-	
-	state Discovery_Response:
-		// if group id matches and sender id is not this node, add sender id to neighbor list
-		if (packet_group == group_ID && sender_id != node_ID) {
-			// check if sender id is already in neighbor list
-			int found = 0;
-			for (i = 0; i < find_neighbor_count; i++) {
-				if (find_neighbors[i] == sender_id) {
-					found = 1;
-					break;
-				}
-			}
-			// if not found, add to neighbor list
-			if (!found && find_neighbor_count < 20) {
-				find_neighbors[find_neighbor_count++] = sender_id;
-			}
-		}
-		tcv_endp(packet);
-		proceed Wait_Message;
-
-	state Send_Discovery_Response:
-		// Creates the 8 byte response packet
-		// Format Group ID 2 bytes / message type 1 byte / sender id 1 byte / padding
-		response = tcv_wnp(Send_Discovery_Response, sfd, 8);
-		response[0] = 0; //Network ID
-		response[1] = 0; //Padding for network ID
-		write_packet = (char *)(response + 2);
-
-		*write_packet++ = (group_ID >> 8) & 0xFF;   // Group ID high
-		*write_packet++ = group_ID & 0xFF;          // Group ID low
-		*write_packet++ = 1;                        // Type = 1 (Discovery Response)
-		*write_packet++ = request_number;           // Echo request number
-		*write_packet++ = node_ID;                  // Sender ID (our ID)
-		*write_packet++ = sender_id;                // Receiver ID (original requester)
-
-		tcv_endp(response);
-		proceed Wait_Message;
 }
 
 fsm Delete{
@@ -536,103 +707,13 @@ fsm Delete{
 		finish;
 }
 
-fsm Delete_Receiver{
-	address packet;
-	address response;
-	
-	char *read_packet;
-	char *write_packet;
-	int packet_group;
-	int i;
-
-	byte request_num;
-	byte type;
-	byte request_number;
-	byte sender_id;
-	byte receiver_id;
-	byte record_index;
-	byte status;
-	state wait_packet:
-		//receives a packets
-		packet = tcv_rnp(wait_packet, sfd);
-		read_packet = (char *)(packet + 1);
-		//reads the packet group type request number sender id and reciever id from the packet
-		packet_group = ((byte)read_packet[0] <<8) | (byte)read_packet[1];
-		type = read_packet[2];
-		request_number = read_packet[3];
-		sender_id = read_packet[4];
-		receiver_id = read_packet[5];
-		//if the packet is the reponse message to delete record message (5)
-		if(type == 5){
-			status = read_packet[6];
-			// check if it's for this node and if it's the node that sent the delete request and if it matches the request number
-			if(receiver_id == node_ID && sender_id == delete_destination_id && request_number == delete_request_num){
-				delete_response_received = 1;
-				delete_response_status = status;
-			}
-			tcv_endp(packet);
-			proceed wait_packet;
-		}
-		//if the packet is a delete record message (3)
-		if (type != 3){
-			tcv_endp(packet);
-			proceed wait_packet;
-		}
-		record_index = read_packet[6];
-		proceed handle_delete;
-
-	state handle_delete:
-	//if node id doesn't match the message group id the message is ignored
-		if (packet_group != group_ID || receiver_id != node_ID){
-			tcv_endp(packet);
-			proceed wait_packet;
-		}
-		//if the record index is out of bounds or the record is not used, set status to 0x03 to indicate the delete operation failed
-		if (record_index >= max_records || database[record_index].used == 0){
-			status = 0x03;
-		}
-		//if the record exists then clear the reecord and set the status to 0x01 to indicate the delete operation was successful
-		else{
-			database[record_index].used = 0;
-			database[record_index].owner_id = 0;
-			database[record_index].timestamp = 0;
-			database[record_index].record[0] = '\0';
-			stored_records--;
-			status = 0x01;
-		}
-		tcv_endp(packet);
-		proceed send_response;
-
-	state send_response:
-	//allocates space for a response packet with 28 bytes of payload
-		response = tcv_wnp(send_response, sfd, 28);
-		// sets the first byte of the packet to 0 for the network ID (always needs to be set to 0)
-		response[0] = 0;
-		//initilises a pointer to write the packet payload starting from the second byte of the packet (i.e starting at group ID)
-		write_packet = (char *)(response + 1);
-		//writes the information to the packet
-		*write_packet++ = (group_ID >> 8) & 0xFF;
-		*write_packet++ = group_ID & 0xFF;
-		*write_packet++ = 5;
-		*write_packet++ = request_number;
-		*write_packet++ = node_ID;
-		*write_packet++ = sender_id;
-		*write_packet++ = status;
-		//padding byte
-		*write_packet++ = 0;
-		//fills the remaining bytes of the packet with 0
-		for (i = 0; i < 20; i++) {
-			write_packet[i] = 0;
-		}
-		//transmits the packet
-		tcv_endp(response);
-		proceed wait_packet;
-}
 fsm root
 {
 	char choice;
 	int db_print_index;
-	
+
+	int temp; int i;
+
 	state Init:
 		phys_cc1350 (0, MAX_PACKET_LENGTH);
 		
@@ -645,24 +726,44 @@ fsm root
 			diag("Cannot open tcv interface");
 			halt();
 		}
-		runfsm Delete_Receiver;
-		runfsm Find_Reciever;
+
+		stored_records = 0;
+		max_records = 40;
+
+		create_finished = 0;
+		retrieve_finished = 0;
+
+		runfsm Receiver;
 
 		proceed Menu_Print;
 	
 	
 	state Menu_Print:
-		ser_outf(Menu_Print, "\r\nGroup%d Device #%d (%d/%d records)", group_ID, node_ID, stored_records, 40);
+		ser_outf(Menu_Print, "\r\nGroup %d Device #%d (%d/%d records)", group_ID, node_ID, stored_records, 40);
 		proceed Menu_Print2;
 	state Menu_Print2:
-		ser_out(Menu_Print2, "\r\n(G)roup ID\r\n(N)ew device ID\r\n(F)ind neighbour\r\n(R)etrieve record from neighbour\r\n(S)how local records\r\nR(e)set local storage\r\n\r\nSelection: ");
+		ser_out( Menu_Print2,
+			"\r\n(G)roup ID"
+			"\r\n(N)ew device ID"
+			"\r\n(F)ind neighbour"
+			"\r\n(C)reate record on neighbor"
+			"\r\n(D)elete record on neighbor"
+			"\r\n(R)etrieve record from neighbour"
+			"\r\n(S)how local records"
+			"\r\nR(e)set local storage"
+			"\r\n\r\nSelection: ");
 		proceed Read_Choice;
 	
 	state Read_Choice:
+		choice = '0';
 		// read the user input 
 		ser_inf(Read_Choice, "%c", &choice);
-		proceed Read_Choice_Process;
+		proceed Read_Choice_Print;
 
+	state Read_Choice_Print:
+		ser_outf(Read_Choice_Process, "%c\r\n", choice);
+		proceed Read_Choice_Process;
+	
 	state Read_Choice_Process:
 		
 		// if "G" or "g", state Ask_Group_ID
@@ -686,7 +787,7 @@ fsm root
 		// if "C, run Create protocol
 		else if ((choice == 'C') || (choice == 'c'))
 		{
-			runfsm Create;
+			proceed Handle_Create;
 		}
 		
 		// if "D", run Delete protocol
@@ -698,7 +799,7 @@ fsm root
 		// if "R", run the Retrieve protocol
 		else if ((choice == 'R') || (choice == 'r'))
 		{
-			runfsm Retrieve;
+			proceed Handle_Retrieve;
 		}
 		
 		// if "S", go to Show_LocalDB state
@@ -717,11 +818,42 @@ fsm root
 		{
 			proceed Menu_Print;
 		}
+
+		release;
 		
 		// Handle states run the corresponding fsm and then 
 		// Run a state to wait for their process to finish
 		// Follows by displaying menu again
 
+
+	state Handle_Create:
+		create_finished = 0;
+		runfsm Create;
+		proceed Wait_Create_Finish;
+
+	state Wait_Create_Finish:
+		if (create_finished == 1){
+			proceed Menu_Print;
+		}
+		else{
+			proceed Wait_Delete_Finish;
+		}
+		release;
+	
+	state Handle_Retrieve:
+		retrieve_finished=  0;
+		runfsm Retrieve;
+		proceed Wait_Retrieve_Finish;
+	
+	state Wait_Retrieve_Finish:
+		if(retrieve_finished == 1){
+			proceed Menu_Print;
+		}
+		else{
+			proced Wait_Retrieve_Finish;
+		}
+		release;
+		
 	state Handle_Delete:
 		// run the delete protocol
 		delete_finished = 0;
@@ -729,26 +861,30 @@ fsm root
 		proceed Wait_Delete_Finish;
 		
 	state Wait_Delete_Finish:
-		if (delete_finished) {
+		if (delete_finished == 1) {
 			proceed Menu_Print;
 		}
+		else{
+			proceed Wait_Delete_Finish;
+		}
+		release;
 
-		delay(1000, Wait_Delete_Finish);
-	
 	state Handle_Find:
-		// run the Find protocol
+		// run the delete protocol
 		find_complete = 0;
 		runfsm Find;
-
-		proceed Wait_Find_Complete;
-	
-	state Wait_Find_Complete:
-		if (find_complete) {
+		proceed Wait_Find_Finish;
+		
+	state Wait_Find_Finish:
+		if (find_complete == 1) {
 			proceed Menu_Print;
 		}
+		delay(100, Wait_Find_Loop);
+	state Wait_Find_Loop:
+		proceed Wait_Find_Finish;
 
-		delay(1000, Wait_Find_Complete);
 	
+		
 		// NEW GROUP ID
 	state Ask_Group_ID:
 		// ask for group ID 
@@ -758,7 +894,7 @@ fsm root
 		ser_inf(Ask_Group_ID_In, "%d", (int*)&group_ID);
 		proceed Group_Id_Finish;
 	state Group_Id_Finish:
-		ser_outf(Group_Id_Finish, "%d\r\n\r\n", &group_ID);
+		ser_outf(Group_Id_Finish, "%d\r\n\r\n", group_ID);
 		proceed Menu_Print;
 
 		// NEW NODE ID
@@ -770,7 +906,7 @@ fsm root
 		ser_inf(Ask_Node_ID_In, "%d", (int*)&node_ID);
 		proceed Node_Id_Finish;
 	state Node_Id_Finish:
-		ser_outf(Node_Id_Finish, "%d\r\n\r\n", &node_ID);
+		ser_outf(Node_Id_Finish, "%d\r\n\r\n", node_ID);
 		proceed Menu_Print;
 		
 	state Show_LocalDB:
@@ -802,4 +938,3 @@ fsm root
 		ser_out(Reset_DB, "\r\n");
 		proceed Menu_Print;
 }
-
