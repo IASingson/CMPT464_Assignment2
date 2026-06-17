@@ -879,7 +879,7 @@ fsm root
 			proceed Menu_Print;
 		}
 		else{
-			delay(100, Wait_Find_Loop);
+			delay(100, Wait_Find_Finish);
 		}
 		release;
 	
