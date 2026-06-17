@@ -36,6 +36,8 @@ byte delete_destination_id;
 byte delete_response_received;
 byte delete_response_status;
 
+int read_byte_tracker;
+
 byte pending_req;
 byte pending_dest;
 byte pending_type;
@@ -85,6 +87,7 @@ fsm Create{
 	char record_data[20];
 
 	int i;
+	char temp_char;
 	
 
 	state ASK_DEST:
@@ -102,6 +105,8 @@ fsm Create{
 		for (i = 0; i < 20; i++){
 			record_data[i] = '\0';
 		}
+		
+		i = 0;
 
 		proceed ASK_RECORD;
 
@@ -110,21 +115,37 @@ fsm Create{
 		proceed READ_RECORD;
 
 	state READ_RECORD:
-		ser_inf(READ_RECORD, "%c\r\n", record_data);
+		temp_char = '\0';
+		ser_inf(READ_RECORD_HELP, "%s", &record_data);
+		release;
+	
+	state READ_RECORD_HELP:
 
-		proceed SEND_CREATE;
+		// if (temp_char == '\r' || temp_char == '\n') {
+		// 	record_data[i] = '\0';
+		// 	proceed SEND_CREATE;
+		// }
+
+		// if (i < sizeof(record_data)-1) {
+		// 	record_data[i] = temp_char;
+		// 	i++;
+		// }
+
+		ser_outf(SEND_CREATE, "%s", record_data);
+		release;
+		
 
 	 state SEND_CREATE:
-		ser_outf(SEND_CREATE, "%c", record_data);
-        pending_req = (byte)rnd();
-        pending_destination_id = (byte)destination_id;
+		
+        pending_request_num = (byte)rnd();
+        pending_destination_id = (byte)dest_id;
         pending_type = MSG_TYPE_CREATE;
         pending_active = 1;
 
         reply_received = 0;
         reply_status = 0;
 
-        packet = tcv_wnp(SEND_CREATE, sfd, 7);
+        packet = tcv_wnp(SEND_CREATE, sfd, 28);
 
         packet[0] = 0;
         p = (char *)(packet);
@@ -132,7 +153,7 @@ fsm Create{
         *p++ = (group_ID >> 8) & 0xFF;
         *p++ = group_ID & 0xFF;
         *p++ = MSG_TYPE_CREATE;
-        *p++ = pending_req;
+        *p++ = pending_request_num;
         *p++ = node_ID;
         *p++ = pending_destination_id;
 
@@ -151,7 +172,6 @@ fsm Create{
 
         delay(3000, TIMEOUT);
         release;
-		proceed TIMEOUT;
 
 	// do we need this tho?
     state TIMEOUT:
@@ -213,7 +233,7 @@ fsm Retrieve {
 		proceed SEND_RETRIEVE;
 
     state SEND_RETRIEVE:
-        pending_req = (byte)rnd();
+        pending_request_num = (byte)rnd();
         pending_destination_id = (byte)dest_id;
         pending_type = MSG_TYPE_RETRIEVE;
         pending_active = 1;
@@ -230,7 +250,7 @@ fsm Retrieve {
         *p++ = (group_ID >> 8) & 0xFF;
         *p++ = group_ID & 0xFF;
         *p++ = MSG_TYPE_RETRIEVE;
-        *p++ = pending_req;
+        *p++ = pending_request_num;
         *p++ = node_ID;
         *p++ = pending_destination_id;
         *p++ = (byte)record_index;
@@ -245,7 +265,6 @@ fsm Retrieve {
 
         delay(3000, TIMEOUT);
         release;
-		proceed TIMEOUT;
 
     state TIMEOUT:
         if (reply_received) {
@@ -369,12 +388,13 @@ fsm Receiver{
 		// 2 +1 +1 +1 +1 + 4; 4 from network id and crc
 		// so 10 total
 
-		response = tcv_wnp(SEND_DISC_RESP, sfd, 6);
+		response = tcv_wnp(SEND_DISC_RESP, sfd, 7);
 
 		response[0] = 0;
 		q = (char *)(response + 1);
 		*q++ = (group_ID >> 8) & 0xFF;
 		*q++ = group_ID & 0xFF;
+		*q++ = MSG_TYPE_DISC_RESP;
 		*q++ = request_num;
 		*q++ = node_ID;
 		*q++ = sender_id;
@@ -396,7 +416,7 @@ fsm Receiver{
 				}
 		}
 		if (!found && find_neighbor_count < 20){
-			find_neighbors[find_neighbor_count] == sender_id;
+			find_neighbors[find_neighbor_count] = sender_id;
 			find_neighbor_count++;
 		}
 		tcv_endp(packet);
@@ -597,6 +617,7 @@ fsm Find{
 	state Wait_For_Responses:
 		// wait 3 sec for incoming response
 		delay(3000, Check_Responses);
+		release;
 
 	state Check_Responses:
 		//checks whether 2 iterations
@@ -685,6 +706,7 @@ fsm Delete{
 			proceed Print_Result;
 		}
 		delay(3000, Timeout);
+		release;
 	//if no response was received print failed to reach....
 	state Timeout:
 		if (delete_response_received){

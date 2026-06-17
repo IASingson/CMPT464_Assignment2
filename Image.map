@@ -34,8 +34,14 @@ Discarded input sections
  .text          0x0000000000000000        0x0 KTMP/app.o
  .data          0x0000000000000000        0x0 KTMP/app.o
  .bss           0x0000000000000000        0x0 KTMP/app.o
+ .bss.destination_id
+                0x0000000000000000        0x4 KTMP/app.o
  .bss.pending_dest
                 0x0000000000000000        0x1 KTMP/app.o
+ .bss.pending_req
+                0x0000000000000000        0x1 KTMP/app.o
+ .bss.read_byte_tracker
+                0x0000000000000000        0x4 KTMP/app.o
  .text          0x0000000000000000        0x0 KTMP/main.o
  .data          0x0000000000000000        0x0 KTMP/main.o
  .bss           0x0000000000000000        0x0 KTMP/main.o
@@ -259,6 +265,19 @@ Discarded input sections
  .text          0x0000000000000000        0x0 KTMP/ser_in.o
  .data          0x0000000000000000        0x0 KTMP/ser_in.o
  .bss           0x0000000000000000        0x0 KTMP/ser_in.o
+ .text.ser_in   0x0000000000000000       0x78 KTMP/ser_in.o
+ .debug_info    0x0000000000000000      0x10f KTMP/ser_in.o
+ .debug_abbrev  0x0000000000000000       0x90 KTMP/ser_in.o
+ .debug_loc     0x0000000000000000      0x112 KTMP/ser_in.o
+ .debug_aranges
+                0x0000000000000000       0x20 KTMP/ser_in.o
+ .debug_ranges  0x0000000000000000       0x10 KTMP/ser_in.o
+ .debug_line    0x0000000000000000      0x16d KTMP/ser_in.o
+ .debug_str     0x0000000000000000      0x1fc KTMP/ser_in.o
+ .comment       0x0000000000000000       0x34 KTMP/ser_in.o
+ .debug_frame   0x0000000000000000       0x30 KTMP/ser_in.o
+ .ARM.attributes
+                0x0000000000000000       0x2d KTMP/ser_in.o
  .text          0x0000000000000000        0x0 KTMP/ser_select.o
  .data          0x0000000000000000        0x0 KTMP/ser_select.o
  .bss           0x0000000000000000        0x0 KTMP/ser_select.o
@@ -471,602 +490,600 @@ Linker script and memory map
                 0x0000000000000000                _Min_Heap_Size = 0x0
                 0x0000000000000100                _Min_Stack_Size = 0x100
 
-.text           0x0000000000000000     0x5ca0
+.text           0x0000000000000000     0x5c2c
                 0x0000000000000000                _text = .
  *(.vectors)
  .vectors       0x0000000000000000       0xc8 KTMP/startup_gcc.o
                 0x0000000000000000                g_pfnVectors
  *(.text*)
- .text.Create   0x00000000000000c8      0x1f8 KTMP/app.o
+ .text.Create   0x00000000000000c8      0x1e8 KTMP/app.o
                 0x00000000000000c8                Create
  .text.Retrieve
-                0x00000000000002c0      0x1bc KTMP/app.o
-                0x00000000000002c0                Retrieve
- .text.Find     0x000000000000047c      0x120 KTMP/app.o
-                0x000000000000047c                Find
- .text.Delete   0x000000000000059c      0x158 KTMP/app.o
-                0x000000000000059c                Delete
+                0x00000000000002b0      0x1bc KTMP/app.o
+                0x00000000000002b0                Retrieve
+ .text.Find     0x000000000000046c      0x124 KTMP/app.o
+                0x000000000000046c                Find
+ .text.Delete   0x0000000000000590      0x15c KTMP/app.o
+                0x0000000000000590                Delete
  .text.Receiver
-                0x00000000000006f4      0x598 KTMP/app.o
-                0x00000000000006f4                Receiver
- .text.root     0x0000000000000c8c      0x334 KTMP/app.o
-                0x0000000000000c8c                root
+                0x00000000000006ec      0x5a4 KTMP/app.o
+                0x00000000000006ec                Receiver
+ .text.root     0x0000000000000c90      0x334 KTMP/app.o
+                0x0000000000000c90                root
  .text.devinit_uart
-                0x0000000000000fc0        0xc KTMP/main.o
- .text.udelay   0x0000000000000fcc       0x2c KTMP/main.o
-                0x0000000000000fcc                udelay
- .text.mdelay   0x0000000000000ff8       0x2a KTMP/main.o
-                0x0000000000000ff8                mdelay
- *fill*         0x0000000000001022        0x2 00000000
+                0x0000000000000fc4        0xc KTMP/main.o
+ .text.udelay   0x0000000000000fd0       0x2c KTMP/main.o
+                0x0000000000000fd0                udelay
+ .text.mdelay   0x0000000000000ffc       0x2a KTMP/main.o
+                0x0000000000000ffc                mdelay
+ *fill*         0x0000000000001026        0x2 00000000
  .text.__pi_ondomain
-                0x0000000000001024       0x40 KTMP/main.o
-                0x0000000000001024                __pi_ondomain
+                0x0000000000001028       0x40 KTMP/main.o
+                0x0000000000001028                __pi_ondomain
  .text.__pi_offdomain
-                0x0000000000001064       0x44 KTMP/main.o
-                0x0000000000001064                __pi_offdomain
+                0x0000000000001068       0x44 KTMP/main.o
+                0x0000000000001068                __pi_offdomain
  .text.__pi_syserror
-                0x00000000000010a8       0x54 KTMP/main.o
-                0x00000000000010a8                __pi_syserror
+                0x00000000000010ac       0x54 KTMP/main.o
+                0x00000000000010ac                __pi_syserror
  .text.tci_run_delay_timer
-                0x00000000000010fc       0x44 KTMP/main.o
-                0x00000000000010fc                tci_run_delay_timer
+                0x0000000000001100       0x44 KTMP/main.o
+                0x0000000000001100                tci_run_delay_timer
  .text.tci_run_auxiliary_timer
-                0x0000000000001140       0x2c KTMP/main.o
-                0x0000000000001140                tci_run_auxiliary_timer
+                0x0000000000001144       0x2c KTMP/main.o
+                0x0000000000001144                tci_run_auxiliary_timer
  .text.AONRTCIntHandler
-                0x000000000000116c      0x118 KTMP/main.o
-                0x000000000000116c                AONRTCIntHandler
+                0x0000000000001170      0x118 KTMP/main.o
+                0x0000000000001170                AONRTCIntHandler
  .text.tci_update_delay_ticks
-                0x0000000000001284       0x54 KTMP/main.o
-                0x0000000000001284                tci_update_delay_ticks
+                0x0000000000001288       0x54 KTMP/main.o
+                0x0000000000001288                tci_update_delay_ticks
  .text.__pi_uart_setrate
-                0x00000000000012d8       0x50 KTMP/main.o
-                0x00000000000012d8                __pi_uart_setrate
+                0x00000000000012dc       0x50 KTMP/main.o
+                0x00000000000012dc                __pi_uart_setrate
  .text.reinit_uart
-                0x0000000000001328       0x2c KTMP/main.o
+                0x000000000000132c       0x2c KTMP/main.o
  .text.ioreq_uart_a
-                0x0000000000001354      0x100 KTMP/main.o
+                0x0000000000001358      0x100 KTMP/main.o
  .text.UART0IntHandler
-                0x0000000000001454       0xbc KTMP/main.o
-                0x0000000000001454                UART0IntHandler
+                0x0000000000001458       0xbc KTMP/main.o
+                0x0000000000001458                UART0IntHandler
  .text.__buttons_setirq
-                0x0000000000001510       0x48 KTMP/main.o
-                0x0000000000001510                __buttons_setirq
+                0x0000000000001514       0x48 KTMP/main.o
+                0x0000000000001514                __buttons_setirq
  .text.__pinlist_setirq
-                0x0000000000001558       0x3c KTMP/main.o
-                0x0000000000001558                __pinlist_setirq
+                0x000000000000155c       0x3c KTMP/main.o
+                0x000000000000155c                __pinlist_setirq
  .text.GPIOIntHandler
-                0x0000000000001594       0xac KTMP/main.o
-                0x0000000000001594                GPIOIntHandler
+                0x0000000000001598       0xac KTMP/main.o
+                0x0000000000001598                GPIOIntHandler
  .text.system_init
-                0x0000000000001640      0x1b8 KTMP/main.o
-                0x0000000000001640                system_init
+                0x0000000000001644      0x1b8 KTMP/main.o
+                0x0000000000001644                system_init
  .text.setpowermode
-                0x00000000000017f8       0x24 KTMP/main.o
-                0x00000000000017f8                setpowermode
+                0x00000000000017fc       0x24 KTMP/main.o
+                0x00000000000017fc                setpowermode
  .text.__pi_release
-                0x000000000000181c      0x268 KTMP/main.o
-                0x000000000000181c                __pi_release
- .text.halt     0x0000000000001a84       0x34 KTMP/main.o
-                0x0000000000001a84                halt
+                0x0000000000001820      0x268 KTMP/main.o
+                0x0000000000001820                __pi_release
+ .text.halt     0x0000000000001a88       0x34 KTMP/main.o
+                0x0000000000001a88                halt
  .text.startup.main
-                0x0000000000001ab8       0x64 KTMP/main.o
-                0x0000000000001ab8                main
- .text.killev   0x0000000000001b1c       0x3c KTMP/kernel.o
- .text.qfree    0x0000000000001b58       0x80 KTMP/kernel.o
- .text.dgout    0x0000000000001bd8       0x14 KTMP/kernel.o
+                0x0000000000001abc       0x64 KTMP/main.o
+                0x0000000000001abc                main
+ .text.killev   0x0000000000001b20       0x3c KTMP/kernel.o
+ .text.qfree    0x0000000000001b5c       0x80 KTMP/kernel.o
+ .text.dgout    0x0000000000001bdc       0x14 KTMP/kernel.o
  .text.__pi_badstate
-                0x0000000000001bec       0x10 KTMP/kernel.o
-                0x0000000000001bec                __pi_badstate
+                0x0000000000001bf0       0x10 KTMP/kernel.o
+                0x0000000000001bf0                __pi_badstate
  .text.utimer_add
-                0x0000000000001bfc       0x2c KTMP/kernel.o
-                0x0000000000001bfc                utimer_add
+                0x0000000000001c00       0x2c KTMP/kernel.o
+                0x0000000000001c00                utimer_add
  .text.__pi_utimer_set
-                0x0000000000001c28        0x6 KTMP/kernel.o
-                0x0000000000001c28                __pi_utimer_set
- *fill*         0x0000000000001c2e        0x2 00000000
+                0x0000000000001c2c        0x6 KTMP/kernel.o
+                0x0000000000001c2c                __pi_utimer_set
+ *fill*         0x0000000000001c32        0x2 00000000
  .text.update_n_wake
-                0x0000000000001c30       0xcc KTMP/kernel.o
-                0x0000000000001c30                update_n_wake
- .text.proceed  0x0000000000001cfc       0x14 KTMP/kernel.o
-                0x0000000000001cfc                proceed
+                0x0000000000001c34       0xcc KTMP/kernel.o
+                0x0000000000001c34                update_n_wake
+ .text.proceed  0x0000000000001d00       0x14 KTMP/kernel.o
+                0x0000000000001d00                proceed
  .text.__pi_wait
-                0x0000000000001d10       0x34 KTMP/kernel.o
-                0x0000000000001d10                __pi_wait
+                0x0000000000001d14       0x34 KTMP/kernel.o
+                0x0000000000001d14                __pi_wait
  .text.__pi_trigger
-                0x0000000000001d44       0x34 KTMP/kernel.o
-                0x0000000000001d44                __pi_trigger
+                0x0000000000001d48       0x34 KTMP/kernel.o
+                0x0000000000001d48                __pi_trigger
  .text.__pi_join
-                0x0000000000001d78       0x24 KTMP/kernel.o
-                0x0000000000001d78                __pi_join
- .text.delay    0x0000000000001d9c       0x38 KTMP/kernel.o
-                0x0000000000001d9c                delay
- .text.running  0x0000000000001dd4       0x24 KTMP/kernel.o
-                0x0000000000001dd4                running
+                0x0000000000001d7c       0x24 KTMP/kernel.o
+                0x0000000000001d7c                __pi_join
+ .text.delay    0x0000000000001da0       0x38 KTMP/kernel.o
+                0x0000000000001da0                delay
+ .text.running  0x0000000000001dd8       0x24 KTMP/kernel.o
+                0x0000000000001dd8                running
  .text.__pi_strlen
-                0x0000000000001df8        0xe KTMP/kernel.o
-                0x0000000000001df8                __pi_strlen
+                0x0000000000001dfc        0xe KTMP/kernel.o
+                0x0000000000001dfc                __pi_strlen
  .text.__pi_strcpy
-                0x0000000000001e06       0x10 KTMP/kernel.o
-                0x0000000000001e06                __pi_strcpy
+                0x0000000000001e0a       0x10 KTMP/kernel.o
+                0x0000000000001e0a                __pi_strcpy
  .text.__pi_memcpy
-                0x0000000000001e16       0x14 KTMP/kernel.o
-                0x0000000000001e16                __pi_memcpy
+                0x0000000000001e1a       0x14 KTMP/kernel.o
+                0x0000000000001e1a                __pi_memcpy
  .text.__pi_memset
-                0x0000000000001e2a        0x4 KTMP/kernel.o
-                0x0000000000001e2a                __pi_memset
- *fill*         0x0000000000001e2e        0x2 00000000
+                0x0000000000001e2e        0x4 KTMP/kernel.o
+                0x0000000000001e2e                __pi_memset
+ *fill*         0x0000000000001e32        0x2 00000000
  .text.adddevfunc
-                0x0000000000001e30       0x24 KTMP/kernel.o
-                0x0000000000001e30                adddevfunc
- .text.io       0x0000000000001e54       0x9c KTMP/kernel.o
-                0x0000000000001e54                io
+                0x0000000000001e34       0x24 KTMP/kernel.o
+                0x0000000000001e34                adddevfunc
+ .text.io       0x0000000000001e58       0x9c KTMP/kernel.o
+                0x0000000000001e58                io
  .text.__pi_malloc_init
-                0x0000000000001ef0       0x50 KTMP/kernel.o
-                0x0000000000001ef0                __pi_malloc_init
+                0x0000000000001ef4       0x50 KTMP/kernel.o
+                0x0000000000001ef4                __pi_malloc_init
  .text.__pi_free
-                0x0000000000001f40       0x48 KTMP/kernel.o
-                0x0000000000001f40                __pi_free
- .text.kill     0x0000000000001f88       0x50 KTMP/kernel.o
-                0x0000000000001f88                kill
+                0x0000000000001f44       0x48 KTMP/kernel.o
+                0x0000000000001f44                __pi_free
+ .text.kill     0x0000000000001f8c       0x50 KTMP/kernel.o
+                0x0000000000001f8c                kill
  .text.__pi_malloc
-                0x0000000000001fd8       0xa8 KTMP/kernel.o
-                0x0000000000001fd8                __pi_malloc
+                0x0000000000001fdc       0xa8 KTMP/kernel.o
+                0x0000000000001fdc                __pi_malloc
  .text.__pi_fork
-                0x0000000000002080       0x34 KTMP/kernel.o
-                0x0000000000002080                __pi_fork
+                0x0000000000002084       0x34 KTMP/kernel.o
+                0x0000000000002084                __pi_fork
  .text.__pi_waitmem
-                0x00000000000020b4       0x18 KTMP/kernel.o
-                0x00000000000020b4                __pi_waitmem
- .text.diag     0x00000000000020cc      0x144 KTMP/kernel.o
-                0x00000000000020cc                diag
- .text.lrnd     0x0000000000002210       0x24 KTMP/kernel.o
-                0x0000000000002210                lrnd
- .text.enq      0x0000000000002234       0x4c KTMP/tcv.o
- .text.apb      0x0000000000002280       0x16 KTMP/tcv.o
- .text.deq      0x0000000000002296       0x1a KTMP/tcv.o
- .text.rlp      0x00000000000022b0        0xe KTMP/tcv.o
- *fill*         0x00000000000022be        0x2 00000000
- .text.dispose  0x00000000000022c0       0x8c KTMP/tcv.o
+                0x00000000000020b8       0x18 KTMP/kernel.o
+                0x00000000000020b8                __pi_waitmem
+ .text.diag     0x00000000000020d0      0x144 KTMP/kernel.o
+                0x00000000000020d0                diag
+ .text.lrnd     0x0000000000002214       0x24 KTMP/kernel.o
+                0x0000000000002214                lrnd
+ .text.enq      0x0000000000002238       0x4c KTMP/tcv.o
+ .text.apb      0x0000000000002284       0x16 KTMP/tcv.o
+ .text.deq      0x000000000000229a       0x1a KTMP/tcv.o
+ .text.rlp      0x00000000000022b4        0xe KTMP/tcv.o
+ *fill*         0x00000000000022c2        0x2 00000000
+ .text.dispose  0x00000000000022c4       0x8c KTMP/tcv.o
  .text.tcv_endp
-                0x000000000000234c       0x70 KTMP/tcv.o
-                0x000000000000234c                tcv_endp
+                0x0000000000002350       0x70 KTMP/tcv.o
+                0x0000000000002350                tcv_endp
  .text.tcv_open
-                0x00000000000023bc       0xc0 KTMP/tcv.o
-                0x00000000000023bc                tcv_open
+                0x00000000000023c0       0xc0 KTMP/tcv.o
+                0x00000000000023c0                tcv_open
  .text.tcv_plug
-                0x000000000000247c       0x24 KTMP/tcv.o
-                0x000000000000247c                tcv_plug
- .text.tcv_rnp  0x00000000000024a0       0x80 KTMP/tcv.o
-                0x00000000000024a0                tcv_rnp
+                0x0000000000002480       0x24 KTMP/tcv.o
+                0x0000000000002480                tcv_plug
+ .text.tcv_rnp  0x00000000000024a4       0x80 KTMP/tcv.o
+                0x00000000000024a4                tcv_rnp
  .text.tcv_wnps
-                0x0000000000002520       0xbc KTMP/tcv.o
-                0x0000000000002520                tcv_wnps
+                0x0000000000002524       0xbc KTMP/tcv.o
+                0x0000000000002524                tcv_wnps
  .text.tcvp_control
-                0x00000000000025dc       0x2c KTMP/tcv.o
-                0x00000000000025dc                tcvp_control
+                0x00000000000025e0       0x2c KTMP/tcv.o
+                0x00000000000025e0                tcvp_control
  .text.tcv_control
-                0x0000000000002608       0x60 KTMP/tcv.o
-                0x0000000000002608                tcv_control
+                0x000000000000260c       0x60 KTMP/tcv.o
+                0x000000000000260c                tcv_control
  .text.tcvp_new
-                0x0000000000002668       0x68 KTMP/tcv.o
-                0x0000000000002668                tcvp_new
+                0x000000000000266c       0x68 KTMP/tcv.o
+                0x000000000000266c                tcvp_new
  .text.tcvphy_reg
-                0x00000000000026d0       0x50 KTMP/tcv.o
-                0x00000000000026d0                tcvphy_reg
+                0x00000000000026d4       0x50 KTMP/tcv.o
+                0x00000000000026d4                tcvphy_reg
  .text.tcvphy_rcv
-                0x0000000000002720       0xa0 KTMP/tcv.o
-                0x0000000000002720                tcvphy_rcv
+                0x0000000000002724       0xa0 KTMP/tcv.o
+                0x0000000000002724                tcvphy_rcv
  .text.tcvphy_get
-                0x00000000000027c0       0x40 KTMP/tcv.o
-                0x00000000000027c0                tcvphy_get
+                0x00000000000027c4       0x40 KTMP/tcv.o
+                0x00000000000027c4                tcvphy_get
  .text.tcvphy_top
-                0x0000000000002800       0x34 KTMP/tcv.o
-                0x0000000000002800                tcvphy_top
+                0x0000000000002804       0x34 KTMP/tcv.o
+                0x0000000000002804                tcvphy_top
  .text.tcvphy_end
-                0x0000000000002834       0x3c KTMP/tcv.o
-                0x0000000000002834                tcvphy_end
+                0x0000000000002838       0x3c KTMP/tcv.o
+                0x0000000000002838                tcvphy_end
  .text.tcv_init
-                0x0000000000002870        0x2 KTMP/tcv.o
-                0x0000000000002870                tcv_init
+                0x0000000000002874        0x2 KTMP/tcv.o
+                0x0000000000002874                tcv_init
  .text.NmiSRHandler
-                0x0000000000002872        0x2 KTMP/startup_gcc.o
-                0x0000000000002872                NmiSR
- .text.FaultISRHandler
-                0x0000000000002874        0x2 KTMP/startup_gcc.o
-                0x0000000000002874                FaultISR
- .text.IntDefaultHandler
                 0x0000000000002876        0x2 KTMP/startup_gcc.o
-                0x0000000000002876                TRNGIntHandler
-                0x0000000000002876                SSI0IntHandler
-                0x0000000000002876                SWEvent0IntHandler
-                0x0000000000002876                uDMAIntHandler
-                0x0000000000002876                WatchdogIntHandler
-                0x0000000000002876                RFCHardwareIntHandler
-                0x0000000000002876                Timer1BIntHandler
-                0x0000000000002876                I2SIntHandler
-                0x0000000000002876                Timer2BIntHandler
-                0x0000000000002876                Timer2AIntHandler
-                0x0000000000002876                Timer1AIntHandler
-                0x0000000000002876                AONIntHandler
-                0x0000000000002876                AUXSWEvent0IntHandler
-                0x0000000000002876                AUXADCIntHandler
-                0x0000000000002876                PendSVIntHandler
-                0x0000000000002876                RFCCPE1IntHandler
-                0x0000000000002876                AUXSWEvent1IntHandler
-                0x0000000000002876                SVCallIntHandler
-                0x0000000000002876                MPUFaultIntHandler
-                0x0000000000002876                SysTickIntHandler
-                0x0000000000002876                BusFaultIntHandler
-                0x0000000000002876                AONProgIntHandler
-                0x0000000000002876                AUXCompAIntHandler
-                0x0000000000002876                SSI1IntHandler
-                0x0000000000002876                FlashIntHandler
-                0x0000000000002876                uDMAErrIntHandler
-                0x0000000000002876                UsageFaultIntHandler
-                0x0000000000002876                RFCCmdAckIntHandler
-                0x0000000000002876                CryptoIntHandler
-                0x0000000000002876                Timer0AIntHandler
-                0x0000000000002876                I2CIntHandler
-                0x0000000000002876                DebugMonIntHandler
-                0x0000000000002876                Timer0BIntHandler
-                0x0000000000002876                AUXCombEventIntHandler
-                0x0000000000002876                Timer3AIntHandler
-                0x0000000000002876                DynProgIntHandler
-                0x0000000000002876                Timer3BIntHandler
+                0x0000000000002876                NmiSR
+ .text.FaultISRHandler
+                0x0000000000002878        0x2 KTMP/startup_gcc.o
+                0x0000000000002878                FaultISR
+ .text.IntDefaultHandler
+                0x000000000000287a        0x2 KTMP/startup_gcc.o
+                0x000000000000287a                TRNGIntHandler
+                0x000000000000287a                SSI0IntHandler
+                0x000000000000287a                SWEvent0IntHandler
+                0x000000000000287a                uDMAIntHandler
+                0x000000000000287a                WatchdogIntHandler
+                0x000000000000287a                RFCHardwareIntHandler
+                0x000000000000287a                Timer1BIntHandler
+                0x000000000000287a                I2SIntHandler
+                0x000000000000287a                Timer2BIntHandler
+                0x000000000000287a                Timer2AIntHandler
+                0x000000000000287a                Timer1AIntHandler
+                0x000000000000287a                AONIntHandler
+                0x000000000000287a                AUXSWEvent0IntHandler
+                0x000000000000287a                AUXADCIntHandler
+                0x000000000000287a                PendSVIntHandler
+                0x000000000000287a                RFCCPE1IntHandler
+                0x000000000000287a                AUXSWEvent1IntHandler
+                0x000000000000287a                SVCallIntHandler
+                0x000000000000287a                MPUFaultIntHandler
+                0x000000000000287a                SysTickIntHandler
+                0x000000000000287a                BusFaultIntHandler
+                0x000000000000287a                AONProgIntHandler
+                0x000000000000287a                AUXCompAIntHandler
+                0x000000000000287a                SSI1IntHandler
+                0x000000000000287a                FlashIntHandler
+                0x000000000000287a                uDMAErrIntHandler
+                0x000000000000287a                UsageFaultIntHandler
+                0x000000000000287a                RFCCmdAckIntHandler
+                0x000000000000287a                CryptoIntHandler
+                0x000000000000287a                Timer0AIntHandler
+                0x000000000000287a                I2CIntHandler
+                0x000000000000287a                DebugMonIntHandler
+                0x000000000000287a                Timer0BIntHandler
+                0x000000000000287a                AUXCombEventIntHandler
+                0x000000000000287a                Timer3AIntHandler
+                0x000000000000287a                DynProgIntHandler
+                0x000000000000287a                Timer3BIntHandler
  .text.ResetISR
-                0x0000000000002878       0x50 KTMP/startup_gcc.o
-                0x0000000000002878                ResetISR
+                0x000000000000287c       0x50 KTMP/startup_gcc.o
+                0x000000000000287c                ResetISR
  .text.get_byte
-                0x00000000000028c8       0x30 KTMP/storage_mx25r8035.o
+                0x00000000000028cc       0x30 KTMP/storage_mx25r8035.o
  .text.put_byte
-                0x00000000000028f8       0x34 KTMP/storage_mx25r8035.o
- .text.cmd_0    0x000000000000292c       0x1c KTMP/storage_mx25r8035.o
- .text.wwait    0x0000000000002948       0x58 KTMP/storage_mx25r8035.o
- .text.ready    0x00000000000029a0       0x44 KTMP/storage_mx25r8035.o
- .text.cclose   0x00000000000029e4       0x24 KTMP/storage_mx25r8035.o
- .text.ee_open  0x0000000000002a08       0x14 KTMP/storage_mx25r8035.o
-                0x0000000000002a08                ee_open
+                0x00000000000028fc       0x34 KTMP/storage_mx25r8035.o
+ .text.cmd_0    0x0000000000002930       0x1c KTMP/storage_mx25r8035.o
+ .text.wwait    0x000000000000294c       0x58 KTMP/storage_mx25r8035.o
+ .text.ready    0x00000000000029a4       0x44 KTMP/storage_mx25r8035.o
+ .text.cclose   0x00000000000029e8       0x24 KTMP/storage_mx25r8035.o
+ .text.ee_open  0x0000000000002a0c       0x14 KTMP/storage_mx25r8035.o
+                0x0000000000002a0c                ee_open
  .text.ee_close
-                0x0000000000002a1c       0x14 KTMP/storage_mx25r8035.o
-                0x0000000000002a1c                ee_close
- .text.ser_out  0x0000000000002a30       0x6c KTMP/ser_out.o
-                0x0000000000002a30                ser_out
- .text.ser_in   0x0000000000002a9c       0x78 KTMP/ser_in.o
-                0x0000000000002a9c                ser_in
+                0x0000000000002a20       0x14 KTMP/storage_mx25r8035.o
+                0x0000000000002a20                ee_close
+ .text.ser_out  0x0000000000002a34       0x6c KTMP/ser_out.o
+                0x0000000000002a34                ser_out
  .text.ser_outf
-                0x0000000000002b14       0x54 KTMP/ser_outf.o
-                0x0000000000002b14                ser_outf
- .text.ser_inf  0x0000000000002b68       0x60 KTMP/ser_inf.o
-                0x0000000000002b68                ser_inf
- .text.plugch   0x0000000000002bc8       0x20 KTMP/rfprop.o
- .text.option   0x0000000000002be8      0x190 KTMP/rfprop.o
+                0x0000000000002aa0       0x54 KTMP/ser_outf.o
+                0x0000000000002aa0                ser_outf
+ .text.ser_inf  0x0000000000002af4       0x60 KTMP/ser_inf.o
+                0x0000000000002af4                ser_inf
+ .text.plugch   0x0000000000002b54       0x20 KTMP/rfprop.o
+ .text.option   0x0000000000002b74      0x190 KTMP/rfprop.o
  .text.issue_cmd
-                0x0000000000002d78       0x48 KTMP/rfprop.o
- .text.rx_de    0x0000000000002dc0       0x24 KTMP/rfprop.o
- .text.rf_off   0x0000000000002de4       0x60 KTMP/rfprop.o
+                0x0000000000002d04       0x48 KTMP/rfprop.o
+ .text.rx_de    0x0000000000002d4c       0x24 KTMP/rfprop.o
+ .text.rf_off   0x0000000000002d70       0x60 KTMP/rfprop.o
  .text.wait_cmd.constprop.0
-                0x0000000000002e44       0x38 KTMP/rfprop.o
- .text.rf_on    0x0000000000002e7c      0x1a8 KTMP/rfprop.o
+                0x0000000000002dd0       0x38 KTMP/rfprop.o
+ .text.rf_on    0x0000000000002e08      0x1a8 KTMP/rfprop.o
  .text.rx_int_enable
-                0x0000000000003024       0xc4 KTMP/rfprop.o
+                0x0000000000002fb0       0xc4 KTMP/rfprop.o
  .text.cc1350_driver
-                0x00000000000030e8      0x1e0 KTMP/rfprop.o
-                0x00000000000030e8                cc1350_driver
+                0x0000000000003074      0x1e0 KTMP/rfprop.o
+                0x0000000000003074                cc1350_driver
  .text.RFCCPE0IntHandler
-                0x00000000000032c8       0x6c KTMP/rfprop.o
-                0x00000000000032c8                RFCCPE0IntHandler
+                0x0000000000003254       0x6c KTMP/rfprop.o
+                0x0000000000003254                RFCCPE0IntHandler
  .text.phys_cc1350
-                0x0000000000003334      0x174 KTMP/rfprop.o
-                0x0000000000003334                phys_cc1350
+                0x00000000000032c0      0x174 KTMP/rfprop.o
+                0x00000000000032c0                phys_cc1350
  .text.tcv_clo_null
-                0x00000000000034a8       0x24 KTMP/plug_null.o
+                0x0000000000003434       0x24 KTMP/plug_null.o
  .text.tcv_rcv_null
-                0x00000000000034cc       0x24 KTMP/plug_null.o
+                0x0000000000003458       0x24 KTMP/plug_null.o
  .text.tcv_frm_null
-                0x00000000000034f0        0x8 KTMP/plug_null.o
+                0x000000000000347c        0x8 KTMP/plug_null.o
  .text.tcv_out_null
-                0x00000000000034f8        0x4 KTMP/plug_null.o
+                0x0000000000003484        0x4 KTMP/plug_null.o
  .text.tcv_xmt_null
-                0x00000000000034fc        0x4 KTMP/plug_null.o
+                0x0000000000003488        0x4 KTMP/plug_null.o
  .text.tcv_ope_null
-                0x0000000000003500       0x48 KTMP/plug_null.o
+                0x000000000000348c       0x48 KTMP/plug_null.o
  .text.__outserial
-                0x0000000000003548       0x70 KTMP/__outserial.o
-                0x0000000000003548                __outserial
+                0x00000000000034d4       0x70 KTMP/__outserial.o
+                0x00000000000034d4                __outserial
  .text.__inserial
-                0x00000000000035b8      0x11c KTMP/__inserial.o
-                0x00000000000035b8                __inserial
- .text.outc.0   0x00000000000036d4       0x20 KTMP/vform.o
+                0x0000000000003544      0x11c KTMP/__inserial.o
+                0x0000000000003544                __inserial
+ .text.outc.0   0x0000000000003660       0x20 KTMP/vform.o
  .text.__pi_vfparse
-                0x00000000000036f4      0x224 KTMP/vform.o
-                0x00000000000036f4                __pi_vfparse
- .text.vform    0x0000000000003918       0x50 KTMP/vform.o
-                0x0000000000003918                vform
- .text.vscan    0x0000000000003968      0x394 KTMP/vscan.o
-                0x0000000000003968                vscan
+                0x0000000000003680      0x224 KTMP/vform.o
+                0x0000000000003680                __pi_vfparse
+ .text.vform    0x00000000000038a4       0x50 KTMP/vform.o
+                0x00000000000038a4                vform
+ .text.vscan    0x00000000000038f4      0x394 KTMP/vscan.o
+                0x00000000000038f4                vscan
  .text.SafeHapiVoid
-                0x0000000000003cfc       0x28 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(adi.o)
-                0x0000000000003cfc                SafeHapiVoid
+                0x0000000000003c88       0x28 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(adi.o)
+                0x0000000000003c88                SafeHapiVoid
  .text.NOROM_AONBatMonTemperatureGetDegC
-                0x0000000000003d24       0x30 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(aon_batmon.o)
-                0x0000000000003d24                NOROM_AONBatMonTemperatureGetDegC
+                0x0000000000003cb0       0x30 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(aon_batmon.o)
+                0x0000000000003cb0                NOROM_AONBatMonTemperatureGetDegC
  .text.NOROM_AONRTCCurrentCompareValueGet
-                0x0000000000003d54       0x20 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(aon_rtc.o)
-                0x0000000000003d54                NOROM_AONRTCCurrentCompareValueGet
+                0x0000000000003ce0       0x20 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(aon_rtc.o)
+                0x0000000000003ce0                NOROM_AONRTCCurrentCompareValueGet
  .text.NOROM_AONRTCCurrent64BitValueGet
-                0x0000000000003d74       0x18 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(aon_rtc.o)
-                0x0000000000003d74                NOROM_AONRTCCurrent64BitValueGet
+                0x0000000000003d00       0x18 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(aon_rtc.o)
+                0x0000000000003d00                NOROM_AONRTCCurrent64BitValueGet
  .text.NOROM_CPUcpsid
-                0x0000000000003d8c        0x8 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(cpu.o)
-                0x0000000000003d8c                NOROM_CPUcpsid
+                0x0000000000003d18        0x8 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(cpu.o)
+                0x0000000000003d18                NOROM_CPUcpsid
  .text.NOROM_CPUcpsie
-                0x0000000000003d94        0x8 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(cpu.o)
-                0x0000000000003d94                NOROM_CPUcpsie
+                0x0000000000003d20        0x8 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(cpu.o)
+                0x0000000000003d20                NOROM_CPUcpsie
  .text.NOROM_OSCClockSourceSet
-                0x0000000000003d9c       0x5c /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(osc.o)
-                0x0000000000003d9c                NOROM_OSCClockSourceSet
+                0x0000000000003d28       0x5c /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(osc.o)
+                0x0000000000003d28                NOROM_OSCClockSourceSet
  .text.NOROM_OSCClockSourceGet
-                0x0000000000003df8       0x2c /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(osc.o)
-                0x0000000000003df8                NOROM_OSCClockSourceGet
+                0x0000000000003d84       0x2c /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(osc.o)
+                0x0000000000003d84                NOROM_OSCClockSourceGet
  .text.NOROM_OSCHF_TurnOnXosc
-                0x0000000000003e24       0x18 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(osc.o)
-                0x0000000000003e24                NOROM_OSCHF_TurnOnXosc
+                0x0000000000003db0       0x18 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(osc.o)
+                0x0000000000003db0                NOROM_OSCHF_TurnOnXosc
  .text.NOROM_OSCHF_AttemptToSwitchToXosc
-                0x0000000000003e3c       0x60 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(osc.o)
-                0x0000000000003e3c                NOROM_OSCHF_AttemptToSwitchToXosc
+                0x0000000000003dc8       0x60 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(osc.o)
+                0x0000000000003dc8                NOROM_OSCHF_AttemptToSwitchToXosc
  .text.NOROM_OSCHF_SwitchToRcOscTurnOffXosc
-                0x0000000000003e9c       0x34 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(osc.o)
-                0x0000000000003e9c                NOROM_OSCHF_SwitchToRcOscTurnOffXosc
+                0x0000000000003e28       0x34 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(osc.o)
+                0x0000000000003e28                NOROM_OSCHF_SwitchToRcOscTurnOffXosc
  .text.NOROM_RFCDoorbellSendTo
-                0x0000000000003ed0       0x28 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(rfc.o)
-                0x0000000000003ed0                NOROM_RFCDoorbellSendTo
+                0x0000000000003e5c       0x28 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(rfc.o)
+                0x0000000000003e5c                NOROM_RFCDoorbellSendTo
  .text.NOROM_RFCSynthPowerDown
-                0x0000000000003ef8       0x4c /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(rfc.o)
-                0x0000000000003ef8                NOROM_RFCSynthPowerDown
+                0x0000000000003e84       0x4c /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(rfc.o)
+                0x0000000000003e84                NOROM_RFCSynthPowerDown
  .text.NOROM_RFCRfTrimRead
-                0x0000000000003f44      0x150 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(rfc.o)
-                0x0000000000003f44                NOROM_RFCRfTrimRead
+                0x0000000000003ed0      0x150 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(rfc.o)
+                0x0000000000003ed0                NOROM_RFCRfTrimRead
  .text.NOROM_RFCRTrim
-                0x0000000000004094      0x118 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(rfc.o)
-                0x0000000000004094                NOROM_RFCRTrim
+                0x0000000000004020      0x118 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(rfc.o)
+                0x0000000000004020                NOROM_RFCRTrim
  .text.NOROM_RFCRfTrimSet
-                0x00000000000041ac       0x20 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(rfc.o)
-                0x00000000000041ac                NOROM_RFCRfTrimSet
+                0x0000000000004138       0x20 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(rfc.o)
+                0x0000000000004138                NOROM_RFCRfTrimSet
  .text.NOROM_RFCAdi3VcoLdoVoltageMode
-                0x00000000000041cc       0x1c /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(rfc.o)
-                0x00000000000041cc                NOROM_RFCAdi3VcoLdoVoltageMode
+                0x0000000000004158       0x1c /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(rfc.o)
+                0x0000000000004158                NOROM_RFCAdi3VcoLdoVoltageMode
  .text.TrimAfterColdResetWakeupFromShutDown
-                0x00000000000041e8       0xd4 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(setup.o)
+                0x0000000000004174       0xd4 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(setup.o)
  .text.NOROM_SetupTrimDevice
-                0x00000000000042bc       0xa4 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(setup.o)
-                0x00000000000042bc                NOROM_SetupTrimDevice
+                0x0000000000004248       0xa4 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(setup.o)
+                0x0000000000004248                NOROM_SetupTrimDevice
  .text.NOROM_SetupSetVddrLevel
-                0x0000000000004360       0x7c /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(setup_rom.o)
-                0x0000000000004360                NOROM_SetupSetVddrLevel
+                0x00000000000042ec       0x7c /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(setup_rom.o)
+                0x00000000000042ec                NOROM_SetupSetVddrLevel
  .text.NOROM_SetupAfterColdResetWakeupFromShutDownCfg1
-                0x00000000000043dc       0xac /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(setup_rom.o)
-                0x00000000000043dc                NOROM_SetupAfterColdResetWakeupFromShutDownCfg1
+                0x0000000000004368       0xac /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(setup_rom.o)
+                0x0000000000004368                NOROM_SetupAfterColdResetWakeupFromShutDownCfg1
  .text.NOROM_SetupGetTrimForAnabypassValue1
-                0x0000000000004488       0x5c /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(setup_rom.o)
-                0x0000000000004488                NOROM_SetupGetTrimForAnabypassValue1
+                0x0000000000004414       0x5c /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(setup_rom.o)
+                0x0000000000004414                NOROM_SetupGetTrimForAnabypassValue1
  .text.NOROM_SetupGetTrimForRcOscLfRtuneCtuneTrim
-                0x00000000000044e4       0x18 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(setup_rom.o)
-                0x00000000000044e4                NOROM_SetupGetTrimForRcOscLfRtuneCtuneTrim
+                0x0000000000004470       0x18 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(setup_rom.o)
+                0x0000000000004470                NOROM_SetupGetTrimForRcOscLfRtuneCtuneTrim
  .text.NOROM_SetupGetTrimForAmpcompTh2
-                0x00000000000044fc       0x10 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(setup_rom.o)
-                0x00000000000044fc                NOROM_SetupGetTrimForAmpcompTh2
+                0x0000000000004488       0x10 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(setup_rom.o)
+                0x0000000000004488                NOROM_SetupGetTrimForAmpcompTh2
  .text.NOROM_SetupGetTrimForAmpcompTh1
-                0x000000000000450c       0x14 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(setup_rom.o)
-                0x000000000000450c                NOROM_SetupGetTrimForAmpcompTh1
+                0x0000000000004498       0x14 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(setup_rom.o)
+                0x0000000000004498                NOROM_SetupGetTrimForAmpcompTh1
  .text.NOROM_SetupGetTrimForAmpcompCtrl
-                0x0000000000004520       0x64 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(setup_rom.o)
-                0x0000000000004520                NOROM_SetupGetTrimForAmpcompCtrl
+                0x00000000000044ac       0x64 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(setup_rom.o)
+                0x00000000000044ac                NOROM_SetupGetTrimForAmpcompCtrl
  .text.NOROM_SetupGetTrimForDblrLoopFilterResetVoltage
-                0x0000000000004584       0x14 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(setup_rom.o)
-                0x0000000000004584                NOROM_SetupGetTrimForDblrLoopFilterResetVoltage
+                0x0000000000004510       0x14 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(setup_rom.o)
+                0x0000000000004510                NOROM_SetupGetTrimForDblrLoopFilterResetVoltage
  .text.NOROM_SetupGetTrimForAdcShModeEn
-                0x0000000000004598       0x14 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(setup_rom.o)
-                0x0000000000004598                NOROM_SetupGetTrimForAdcShModeEn
+                0x0000000000004524       0x14 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(setup_rom.o)
+                0x0000000000004524                NOROM_SetupGetTrimForAdcShModeEn
  .text.NOROM_SetupGetTrimForAdcShVbufEn
-                0x00000000000045ac       0x14 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(setup_rom.o)
-                0x00000000000045ac                NOROM_SetupGetTrimForAdcShVbufEn
+                0x0000000000004538       0x14 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(setup_rom.o)
+                0x0000000000004538                NOROM_SetupGetTrimForAdcShVbufEn
  .text.NOROM_SetupGetTrimForXoscHfCtl
-                0x00000000000045c0       0x28 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(setup_rom.o)
-                0x00000000000045c0                NOROM_SetupGetTrimForXoscHfCtl
+                0x000000000000454c       0x28 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(setup_rom.o)
+                0x000000000000454c                NOROM_SetupGetTrimForXoscHfCtl
  .text.NOROM_SetupGetTrimForXoscHfFastStart
-                0x00000000000045e8       0x10 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(setup_rom.o)
-                0x00000000000045e8                NOROM_SetupGetTrimForXoscHfFastStart
+                0x0000000000004574       0x10 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(setup_rom.o)
+                0x0000000000004574                NOROM_SetupGetTrimForXoscHfFastStart
  .text.NOROM_SetupGetTrimForRadcExtCfg
-                0x00000000000045f8       0x2c /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(setup_rom.o)
-                0x00000000000045f8                NOROM_SetupGetTrimForRadcExtCfg
+                0x0000000000004584       0x2c /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(setup_rom.o)
+                0x0000000000004584                NOROM_SetupGetTrimForRadcExtCfg
  .text.NOROM_SetupGetTrimForRcOscLfIBiasTrim
-                0x0000000000004624       0x14 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(setup_rom.o)
-                0x0000000000004624                NOROM_SetupGetTrimForRcOscLfIBiasTrim
+                0x00000000000045b0       0x14 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(setup_rom.o)
+                0x00000000000045b0                NOROM_SetupGetTrimForRcOscLfIBiasTrim
  .text.NOROM_SetupGetTrimForXoscLfRegulatorAndCmirrwrRatio
-                0x0000000000004638       0x14 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(setup_rom.o)
-                0x0000000000004638                NOROM_SetupGetTrimForXoscLfRegulatorAndCmirrwrRatio
+                0x00000000000045c4       0x14 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(setup_rom.o)
+                0x00000000000045c4                NOROM_SetupGetTrimForXoscLfRegulatorAndCmirrwrRatio
  .text.NOROM_SetupAfterColdResetWakeupFromShutDownCfg2
-                0x000000000000464c      0x110 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(setup_rom.o)
-                0x000000000000464c                NOROM_SetupAfterColdResetWakeupFromShutDownCfg2
+                0x00000000000045d8      0x110 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(setup_rom.o)
+                0x00000000000045d8                NOROM_SetupAfterColdResetWakeupFromShutDownCfg2
  .text.NOROM_SetupSetCacheModeAccordingToCcfgSetting
-                0x000000000000475c       0x64 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(setup_rom.o)
-                0x000000000000475c                NOROM_SetupSetCacheModeAccordingToCcfgSetting
+                0x00000000000046e8       0x64 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(setup_rom.o)
+                0x00000000000046e8                NOROM_SetupSetCacheModeAccordingToCcfgSetting
  .text.NOROM_SetupSetAonRtcSubSecInc
-                0x00000000000047c0       0x28 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(setup_rom.o)
-                0x00000000000047c0                NOROM_SetupSetAonRtcSubSecInc
+                0x000000000000474c       0x28 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(setup_rom.o)
+                0x000000000000474c                NOROM_SetupSetAonRtcSubSecInc
  .text.NOROM_SetupAfterColdResetWakeupFromShutDownCfg3
-                0x00000000000047e8      0x150 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(setup_rom.o)
-                0x00000000000047e8                NOROM_SetupAfterColdResetWakeupFromShutDownCfg3
+                0x0000000000004774      0x150 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(setup_rom.o)
+                0x0000000000004774                NOROM_SetupAfterColdResetWakeupFromShutDownCfg3
  .text.NOROM_SysCtrlSetRechargeBeforePowerDown
-                0x0000000000004938      0x220 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(sys_ctrl.o)
-                0x0000000000004938                NOROM_SysCtrlSetRechargeBeforePowerDown
+                0x00000000000048c4      0x220 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(sys_ctrl.o)
+                0x00000000000048c4                NOROM_SysCtrlSetRechargeBeforePowerDown
  .text.NOROM_SysCtrlAdjustRechargeAfterPowerDown
-                0x0000000000004b58       0x60 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(sys_ctrl.o)
-                0x0000000000004b58                NOROM_SysCtrlAdjustRechargeAfterPowerDown
+                0x0000000000004ae4       0x60 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(sys_ctrl.o)
+                0x0000000000004ae4                NOROM_SysCtrlAdjustRechargeAfterPowerDown
  .text.NOROM_SysCtrlResetSourceGet
-                0x0000000000004bb8       0x18 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(sys_ctrl.o)
-                0x0000000000004bb8                NOROM_SysCtrlResetSourceGet
+                0x0000000000004b44       0x18 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(sys_ctrl.o)
+                0x0000000000004b44                NOROM_SysCtrlResetSourceGet
  .text.NOROM_ChipInfo_GetChipFamily
-                0x0000000000004bd0       0x4c /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(chipinfo.o)
-                0x0000000000004bd0                NOROM_ChipInfo_GetChipFamily
+                0x0000000000004b5c       0x4c /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(chipinfo.o)
+                0x0000000000004b5c                NOROM_ChipInfo_GetChipFamily
  .text.NOROM_ChipInfo_GetHwRevision
-                0x0000000000004c1c       0x6c /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(chipinfo.o)
-                0x0000000000004c1c                NOROM_ChipInfo_GetHwRevision
+                0x0000000000004ba8       0x6c /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(chipinfo.o)
+                0x0000000000004ba8                NOROM_ChipInfo_GetHwRevision
  .text.NOROM_ThisCodeIsBuiltForCC13xxHwRev20AndLater_HaltIfViolated
-                0x0000000000004c88       0x16 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(chipinfo.o)
-                0x0000000000004c88                NOROM_ThisCodeIsBuiltForCC13xxHwRev20AndLater_HaltIfViolated
- *fill*         0x0000000000004c9e        0x2 00000000
+                0x0000000000004c14       0x16 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(chipinfo.o)
+                0x0000000000004c14                NOROM_ThisCodeIsBuiltForCC13xxHwRev20AndLater_HaltIfViolated
+ *fill*         0x0000000000004c2a        0x2 00000000
  .text.AuxAdiDdiSafeWrite.constprop.1
-                0x0000000000004ca0       0x28 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(ddi.o)
+                0x0000000000004c2c       0x28 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(ddi.o)
  .text.NOROM_DDI32RegWrite
-                0x0000000000004cc8        0x8 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(ddi.o)
-                0x0000000000004cc8                NOROM_DDI32RegWrite
- .text          0x0000000000004cd0       0xa8 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/nofp/libg.a(lib_a-memcpy-stub.o)
-                0x0000000000004cd0                memcpy
- .text          0x0000000000004d78       0xb0 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/nofp/libg.a(lib_a-memset.o)
-                0x0000000000004d78                memset
+                0x0000000000004c54        0x8 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(ddi.o)
+                0x0000000000004c54                NOROM_DDI32RegWrite
+ .text          0x0000000000004c5c       0xa8 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/nofp/libg.a(lib_a-memcpy-stub.o)
+                0x0000000000004c5c                memcpy
+ .text          0x0000000000004d04       0xb0 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/nofp/libg.a(lib_a-memset.o)
+                0x0000000000004d04                memset
  *(.rodata*)
  .rodata.Create.str1.1
-                0x0000000000004e28       0xa3 KTMP/app.o
+                0x0000000000004db4       0xa0 KTMP/app.o
                                          0xa6 (size before relaxing)
  .rodata.Retrieve.str1.1
-                0x0000000000004ecb       0x75 KTMP/app.o
+                0x0000000000004e54       0x75 KTMP/app.o
  .rodata.Find.str1.1
-                0x0000000000004f40       0x13 KTMP/app.o
+                0x0000000000004ec9       0x13 KTMP/app.o
  .rodata.Delete.str1.1
-                0x0000000000004f53       0x37 KTMP/app.o
+                0x0000000000004edc       0x37 KTMP/app.o
                                          0x62 (size before relaxing)
  .rodata.root.str1.1
-                0x0000000000004f8a      0x16d KTMP/app.o
-                                        0x170 (size before relaxing)
+                0x0000000000004f13      0x170 KTMP/app.o
+                                        0x173 (size before relaxing)
  .rodata.__pi_syserror.str1.1
-                0x00000000000050f7        0xf KTMP/main.o
+                0x0000000000005083        0xf KTMP/main.o
  .rodata.ioreq_uart_a.str1.1
-                0x0000000000005106        0x8 KTMP/main.o
+                0x0000000000005092        0x8 KTMP/main.o
  .rodata.system_init.str1.1
-                0x000000000000510e       0x63 KTMP/main.o
+                0x000000000000509a       0x63 KTMP/main.o
                                          0x64 (size before relaxing)
  .rodata.__pi_release.str1.1
-                0x0000000000005171        0x3 KTMP/main.o
+                0x00000000000050fd        0x3 KTMP/main.o
  .rodata.halt.str1.1
-                0x0000000000005174        0xd KTMP/main.o
- *fill*         0x0000000000005181        0x3 00000000
+                0x0000000000005100        0xd KTMP/main.o
+ *fill*         0x000000000000510d        0x3 00000000
  .rodata.port_confs
-                0x0000000000005184       0x44 KTMP/main.o
-                0x0000000000005184                port_confs
+                0x0000000000005110       0x44 KTMP/main.o
+                0x0000000000005110                port_confs
  .rodata.__pi_badstate.str1.1
-                0x00000000000051c8        0x6 KTMP/kernel.o
+                0x0000000000005154        0x6 KTMP/kernel.o
  .rodata.utimer_add.str1.1
-                0x00000000000051ce        0x5 KTMP/kernel.o
+                0x000000000000515a        0x5 KTMP/kernel.o
  .rodata.__pi_wait.str1.1
-                0x00000000000051d3        0x3 KTMP/kernel.o
+                0x000000000000515f        0x3 KTMP/kernel.o
  .rodata.adddevfunc.str1.1
-                0x00000000000051d6        0x5 KTMP/kernel.o
+                0x0000000000005162        0x5 KTMP/kernel.o
  .rodata.io.str1.1
-                0x00000000000051db        0x3 KTMP/kernel.o
+                0x0000000000005167        0x3 KTMP/kernel.o
  .rodata.__pi_malloc_init.str1.1
-                0x00000000000051de        0x5 KTMP/kernel.o
+                0x000000000000516a        0x5 KTMP/kernel.o
  .rodata.__pi_free.str1.1
-                0x00000000000051e3        0x5 KTMP/kernel.o
+                0x000000000000516f        0x5 KTMP/kernel.o
  .rodata.kill.str1.1
-                0x00000000000051e8        0x4 KTMP/kernel.o
+                0x0000000000005174        0x4 KTMP/kernel.o
  .rodata.__pi_malloc.str1.1
-                0x00000000000051ec        0x5 KTMP/kernel.o
+                0x0000000000005178        0x5 KTMP/kernel.o
  .rodata.__pi_hex_enc_table
-                0x00000000000051f1       0x10 KTMP/kernel.o
-                0x00000000000051f1                __pi_hex_enc_table
+                0x000000000000517d       0x10 KTMP/kernel.o
+                0x000000000000517d                __pi_hex_enc_table
  .rodata.enq.str1.1
-                0x0000000000005201        0x6 KTMP/tcv.o
+                0x000000000000518d        0x6 KTMP/tcv.o
  .rodata.dispose.str1.1
-                0x0000000000005207       0x18 KTMP/tcv.o
+                0x0000000000005193       0x18 KTMP/tcv.o
  .rodata.tcv_endp.str1.1
-                0x000000000000521f        0xc KTMP/tcv.o
+                0x00000000000051ab        0xc KTMP/tcv.o
  .rodata.tcv_open.str1.1
-                0x000000000000522b       0x12 KTMP/tcv.o
+                0x00000000000051b7       0x12 KTMP/tcv.o
  .rodata.tcv_rnp.str1.1
-                0x000000000000523d        0xc KTMP/tcv.o
+                0x00000000000051c9        0xc KTMP/tcv.o
  .rodata.tcv_wnps.str1.1
-                0x0000000000005249       0x12 KTMP/tcv.o
+                0x00000000000051d5       0x12 KTMP/tcv.o
  .rodata.tcvp_control.str1.1
-                0x000000000000525b        0x6 KTMP/tcv.o
+                0x00000000000051e7        0x6 KTMP/tcv.o
  .rodata.tcv_control.str1.1
-                0x0000000000005261        0x6 KTMP/tcv.o
+                0x00000000000051ed        0x6 KTMP/tcv.o
  .rodata.tcvp_new.str1.1
-                0x0000000000005267        0xc KTMP/tcv.o
+                0x00000000000051f3        0xc KTMP/tcv.o
  .rodata.tcvphy_reg.str1.1
-                0x0000000000005273        0xc KTMP/tcv.o
+                0x00000000000051ff        0xc KTMP/tcv.o
  .rodata.tcvphy_rcv.str1.1
-                0x000000000000527f        0xc KTMP/tcv.o
+                0x000000000000520b        0xc KTMP/tcv.o
  .rodata.tcvphy_get.str1.1
-                0x000000000000528b        0x6 KTMP/tcv.o
+                0x0000000000005217        0x6 KTMP/tcv.o
  .rodata.tcvphy_top.str1.1
-                0x0000000000005291        0x6 KTMP/tcv.o
+                0x000000000000521d        0x6 KTMP/tcv.o
  .rodata.tcvphy_end.str1.1
-                0x0000000000005297        0x6 KTMP/tcv.o
+                0x0000000000005223        0x6 KTMP/tcv.o
  .rodata.__input_pins
-                0x000000000000529d        0x4 KTMP/pin_sensor.o
-                0x000000000000529d                __input_pins
- *fill*         0x00000000000052a1        0x1 00000000
+                0x0000000000005229        0x4 KTMP/pin_sensor.o
+                0x0000000000005229                __input_pins
+ *fill*         0x000000000000522d        0x1 00000000
  .rodata.__button_list
-                0x00000000000052a2        0x4 KTMP/buttons.o
-                0x00000000000052a2                __button_list
+                0x000000000000522e        0x4 KTMP/buttons.o
+                0x000000000000522e                __button_list
  .rodata.option.str1.1
-                0x00000000000052a6        0x8 KTMP/rfprop.o
+                0x0000000000005232        0x8 KTMP/rfprop.o
  .rodata.issue_cmd.str1.1
-                0x00000000000052ae       0x19 KTMP/rfprop.o
+                0x000000000000523a       0x19 KTMP/rfprop.o
  .rodata.wait_cmd.constprop.0.str1.1
-                0x00000000000052c7       0x14 KTMP/rfprop.o
+                0x0000000000005253       0x14 KTMP/rfprop.o
  .rodata.rx_int_enable.str1.1
-                0x00000000000052db        0x7 KTMP/rfprop.o
+                0x0000000000005267        0x7 KTMP/rfprop.o
  .rodata.cc1350_driver.str1.1
-                0x00000000000052e2        0x8 KTMP/rfprop.o
+                0x000000000000526e        0x8 KTMP/rfprop.o
  .rodata.phys_cc1350.str1.1
-                0x00000000000052ea       0x20 KTMP/rfprop.o
+                0x0000000000005276       0x20 KTMP/rfprop.o
  .rodata.patable
-                0x000000000000530a       0x10 KTMP/rfprop.o
- *fill*         0x000000000000531a        0x2 00000000
+                0x0000000000005296       0x10 KTMP/rfprop.o
+ *fill*         0x00000000000052a6        0x2 00000000
  .rodata.patchGenfskRfe
-                0x000000000000531c      0x6b4 KTMP/rfprop.o
+                0x00000000000052a8      0x6b4 KTMP/rfprop.o
  .rodata.patchImageGenfsk
-                0x00000000000059d0      0x28c KTMP/rfprop.o
+                0x000000000000595c      0x28c KTMP/rfprop.o
  .rodata.ratable
-                0x0000000000005c5c        0xc KTMP/rfprop.o
+                0x0000000000005be8        0xc KTMP/rfprop.o
  .rodata.tcv_ope_null.str1.1
-                0x0000000000005c68       0x17 KTMP/plug_null.o
- *fill*         0x0000000000005c7f        0x1 00000000
+                0x0000000000005bf4       0x17 KTMP/plug_null.o
+ *fill*         0x0000000000005c0b        0x1 00000000
  .rodata.plug_null
-                0x0000000000005c80       0x20 KTMP/plug_null.o
-                0x0000000000005c80                plug_null
+                0x0000000000005c0c       0x20 KTMP/plug_null.o
+                0x0000000000005c0c                plug_null
  *(.init)
  *(.fini*)
  *(.eh_frame*)
-                0x0000000000005ca0                _etext = .
+                0x0000000000005c2c                _etext = .
 
-.glue_7         0x0000000000005ca0        0x0
- .glue_7        0x0000000000005ca0        0x0 linker stubs
+.glue_7         0x0000000000005c2c        0x0
+ .glue_7        0x0000000000005c2c        0x0 linker stubs
 
-.glue_7t        0x0000000000005ca0        0x0
- .glue_7t       0x0000000000005ca0        0x0 linker stubs
+.glue_7t        0x0000000000005c2c        0x0
+ .glue_7t       0x0000000000005c2c        0x0 linker stubs
 
-.vfp11_veneer   0x0000000000005ca0        0x0
- .vfp11_veneer  0x0000000000005ca0        0x0 linker stubs
+.vfp11_veneer   0x0000000000005c2c        0x0
+ .vfp11_veneer  0x0000000000005c2c        0x0 linker stubs
 
-.v4_bx          0x0000000000005ca0        0x0
- .v4_bx         0x0000000000005ca0        0x0 linker stubs
+.v4_bx          0x0000000000005c2c        0x0
+ .v4_bx         0x0000000000005c2c        0x0 linker stubs
 
-.iplt           0x0000000000005ca0        0x0
- .iplt          0x0000000000005ca0        0x0 KTMP/app.o
+.iplt           0x0000000000005c2c        0x0
+ .iplt          0x0000000000005c2c        0x0 KTMP/app.o
 
-.ARM.exidx      0x0000000000005ca0        0x0
-                0x0000000000005ca0                __exidx_start = .
+.ARM.exidx      0x0000000000005c2c        0x0
+                0x0000000000005c2c                __exidx_start = .
  *(.ARM.exidx* .gnu.linkonce.armexidx.*)
-                0x0000000000005ca0                __exidx_end = .
+                0x0000000000005c2c                __exidx_end = .
 
 .ARM.extab
  *(.ARM.extab* .gnu.linkonce.armextab.*)
 
-.data           0x0000000020000000      0x10c load address 0x0000000000005ca0
+.data           0x0000000020000000      0x10c load address 0x0000000000005c2c
                 0x0000000020000000                _data = .
  *(vtable)
  *(.data*)
@@ -1097,10 +1114,10 @@ Linker script and memory map
                 0x00000000200000b8       0x54 KTMP/smartrf_settings_lp_hr.o
                 0x000000002000010c                _edata = .
 
-.igot.plt       0x000000002000010c        0x0 load address 0x0000000000005dac
+.igot.plt       0x000000002000010c        0x0 load address 0x0000000000005d38
  .igot.plt      0x000000002000010c        0x0 KTMP/app.o
 
-.bss            0x000000002000010c      0x654 load address 0x0000000000005dac
+.bss            0x000000002000010c      0x64c load address 0x0000000000005d38
                 0x000000002000010c                __bss_start__ = .
                 0x000000002000010c                _bss = .
  *(.bss*)
@@ -1133,189 +1150,182 @@ Linker script and memory map
  *fill*         0x0000000020000583        0x1 
  .bss.dest_id.26
                 0x0000000020000584        0x4 KTMP/app.o
- .bss.dest_id.31
+ .bss.dest_id.32
                 0x0000000020000588        0x4 KTMP/app.o
- .bss.destination_id
-                0x000000002000058c        0x4 KTMP/app.o
-                0x000000002000058c                destination_id
  .bss.destination_id.5
-                0x0000000020000590        0x4 KTMP/app.o
+                0x000000002000058c        0x4 KTMP/app.o
  .bss.find_active
-                0x0000000020000594        0x1 KTMP/app.o
-                0x0000000020000594                find_active
- *fill*         0x0000000020000595        0x3 
+                0x0000000020000590        0x1 KTMP/app.o
+                0x0000000020000590                find_active
+ *fill*         0x0000000020000591        0x3 
  .bss.find_complete
-                0x0000000020000598        0x4 KTMP/app.o
-                0x0000000020000598                find_complete
+                0x0000000020000594        0x4 KTMP/app.o
+                0x0000000020000594                find_complete
  .bss.find_iteration
-                0x000000002000059c        0x4 KTMP/app.o
-                0x000000002000059c                find_iteration
+                0x0000000020000598        0x4 KTMP/app.o
+                0x0000000020000598                find_iteration
  .bss.find_neighbor_count
-                0x00000000200005a0        0x4 KTMP/app.o
-                0x00000000200005a0                find_neighbor_count
+                0x000000002000059c        0x4 KTMP/app.o
+                0x000000002000059c                find_neighbor_count
  .bss.find_neighbors
-                0x00000000200005a4       0x14 KTMP/app.o
-                0x00000000200005a4                find_neighbors
+                0x00000000200005a0       0x14 KTMP/app.o
+                0x00000000200005a0                find_neighbors
  .bss.find_req_num
-                0x00000000200005b8        0x1 KTMP/app.o
-                0x00000000200005b8                find_req_num
- *fill*         0x00000000200005b9        0x3 
- .bss.found.12  0x00000000200005bc        0x4 KTMP/app.o
- .bss.group_ID  0x00000000200005c0        0x2 KTMP/app.o
-                0x00000000200005c0                group_ID
- *fill*         0x00000000200005c2        0x2 
- .bss.i.11      0x00000000200005c4        0x4 KTMP/app.o
- .bss.i.30      0x00000000200005c8        0x4 KTMP/app.o
+                0x00000000200005b4        0x1 KTMP/app.o
+                0x00000000200005b4                find_req_num
+ *fill*         0x00000000200005b5        0x3 
+ .bss.found.12  0x00000000200005b8        0x4 KTMP/app.o
+ .bss.group_ID  0x00000000200005bc        0x2 KTMP/app.o
+                0x00000000200005bc                group_ID
+ *fill*         0x00000000200005be        0x2 
+ .bss.i.11      0x00000000200005c0        0x4 KTMP/app.o
+ .bss.i.31      0x00000000200005c4        0x4 KTMP/app.o
  .bss.max_records
-                0x00000000200005cc        0x4 KTMP/app.o
-                0x00000000200005cc                max_records
+                0x00000000200005c8        0x4 KTMP/app.o
+                0x00000000200005c8                max_records
  .bss.msg_type.19
-                0x00000000200005d0        0x1 KTMP/app.o
- *fill*         0x00000000200005d1        0x3 
+                0x00000000200005cc        0x1 KTMP/app.o
+ *fill*         0x00000000200005cd        0x3 
  .bss.neighbor_print_index.6
-                0x00000000200005d4        0x4 KTMP/app.o
- .bss.node_ID   0x00000000200005d8        0x4 KTMP/app.o
-                0x00000000200005d8                node_ID
- .bss.p.21      0x00000000200005dc        0x4 KTMP/app.o
- .bss.p.27      0x00000000200005e0        0x4 KTMP/app.o
+                0x00000000200005d0        0x4 KTMP/app.o
+ .bss.node_ID   0x00000000200005d4        0x4 KTMP/app.o
+                0x00000000200005d4                node_ID
+ .bss.p.21      0x00000000200005d8        0x4 KTMP/app.o
+ .bss.p.27      0x00000000200005dc        0x4 KTMP/app.o
  .bss.packet.22
-                0x00000000200005e4        0x4 KTMP/app.o
- .bss.packet.8  0x00000000200005e8        0x4 KTMP/app.o
+                0x00000000200005e0        0x4 KTMP/app.o
+ .bss.packet.8  0x00000000200005e4        0x4 KTMP/app.o
  .bss.packet_group.20
-                0x00000000200005ec        0x4 KTMP/app.o
+                0x00000000200005e8        0x4 KTMP/app.o
  .bss.pending_active
-                0x00000000200005f0        0x1 KTMP/app.o
-                0x00000000200005f0                pending_active
+                0x00000000200005ec        0x1 KTMP/app.o
+                0x00000000200005ec                pending_active
  .bss.pending_destination_id
-                0x00000000200005f1        0x1 KTMP/app.o
-                0x00000000200005f1                pending_destination_id
- .bss.pending_req
-                0x00000000200005f2        0x1 KTMP/app.o
-                0x00000000200005f2                pending_req
+                0x00000000200005ed        0x1 KTMP/app.o
+                0x00000000200005ed                pending_destination_id
  .bss.pending_request_num
-                0x00000000200005f3        0x1 KTMP/app.o
-                0x00000000200005f3                pending_request_num
+                0x00000000200005ee        0x1 KTMP/app.o
+                0x00000000200005ee                pending_request_num
  .bss.pending_type
-                0x00000000200005f4        0x1 KTMP/app.o
-                0x00000000200005f4                pending_type
- *fill*         0x00000000200005f5        0x3 
- .bss.q.13      0x00000000200005f8        0x4 KTMP/app.o
+                0x00000000200005ef        0x1 KTMP/app.o
+                0x00000000200005ef                pending_type
+ .bss.q.13      0x00000000200005f0        0x4 KTMP/app.o
  .bss.read_packet.7
-                0x00000000200005fc        0x4 KTMP/app.o
+                0x00000000200005f4        0x4 KTMP/app.o
  .bss.receiver_id.16
-                0x0000000020000600        0x1 KTMP/app.o
- .bss.record_data.29
-                0x0000000020000601       0x14 KTMP/app.o
- *fill*         0x0000000020000615        0x3 
+                0x00000000200005f8        0x1 KTMP/app.o
+ .bss.record_data.30
+                0x00000000200005f9       0x14 KTMP/app.o
+ *fill*         0x000000002000060d        0x3 
  .bss.record_index.25
-                0x0000000020000618        0x4 KTMP/app.o
+                0x0000000020000610        0x4 KTMP/app.o
  .bss.record_index.4
-                0x000000002000061c        0x4 KTMP/app.o
+                0x0000000020000614        0x4 KTMP/app.o
  .bss.reply_received
-                0x0000000020000620        0x1 KTMP/app.o
-                0x0000000020000620                reply_received
+                0x0000000020000618        0x1 KTMP/app.o
+                0x0000000020000618                reply_received
  .bss.reply_record
-                0x0000000020000621       0x14 KTMP/app.o
-                0x0000000020000621                reply_record
+                0x0000000020000619       0x14 KTMP/app.o
+                0x0000000020000619                reply_record
  .bss.reply_status
-                0x0000000020000635        0x1 KTMP/app.o
-                0x0000000020000635                reply_status
+                0x000000002000062d        0x1 KTMP/app.o
+                0x000000002000062d                reply_status
  .bss.request_num.18
-                0x0000000020000636        0x1 KTMP/app.o
- *fill*         0x0000000020000637        0x1 
+                0x000000002000062e        0x1 KTMP/app.o
+ *fill*         0x000000002000062f        0x1 
  .bss.retrieve_finished
-                0x0000000020000638        0x4 KTMP/app.o
-                0x0000000020000638                retrieve_finished
+                0x0000000020000630        0x4 KTMP/app.o
+                0x0000000020000630                retrieve_finished
  .bss.sender_id.17
-                0x000000002000063c        0x1 KTMP/app.o
+                0x0000000020000634        0x1 KTMP/app.o
  .bss.status.15
-                0x000000002000063d        0x1 KTMP/app.o
- *fill*         0x000000002000063e        0x2 
+                0x0000000020000635        0x1 KTMP/app.o
+ *fill*         0x0000000020000636        0x2 
  .bss.stored_records
-                0x0000000020000640        0x4 KTMP/app.o
-                0x0000000020000640                stored_records
+                0x0000000020000638        0x4 KTMP/app.o
+                0x0000000020000638                stored_records
  .bss.temp_create.10
-                0x0000000020000644        0x4 KTMP/app.o
+                0x000000002000063c        0x4 KTMP/app.o
  .bss.__pi_uart
-                0x0000000020000648        0x8 KTMP/main.o
-                0x0000000020000648                __pi_uart
- .bss.setdel    0x0000000020000650        0x2 KTMP/main.o
- *fill*         0x0000000020000652        0x2 
+                0x0000000020000640        0x8 KTMP/main.o
+                0x0000000020000640                __pi_uart
+ .bss.setdel    0x0000000020000648        0x2 KTMP/main.o
+ *fill*         0x000000002000064a        0x2 
  .bss.system_event_count
-                0x0000000020000654        0x4 KTMP/main.o
-                0x0000000020000654                system_event_count
- .bss.urates    0x0000000020000658        0x2 KTMP/main.o
- *fill*         0x000000002000065a        0x2 
- .bss.__PCB     0x000000002000065c        0x4 KTMP/kernel.o
-                0x000000002000065c                __PCB
+                0x000000002000064c        0x4 KTMP/main.o
+                0x000000002000064c                system_event_count
+ .bss.urates    0x0000000020000650        0x2 KTMP/main.o
+ *fill*         0x0000000020000652        0x2 
+ .bss.__PCB     0x0000000020000654        0x4 KTMP/kernel.o
+                0x0000000020000654                __PCB
  .bss.__pi_curr
-                0x0000000020000660        0x4 KTMP/kernel.o
-                0x0000000020000660                __pi_curr
+                0x0000000020000658        0x4 KTMP/kernel.o
+                0x0000000020000658                __pi_curr
  .bss.__pi_mintk
-                0x0000000020000664        0x2 KTMP/kernel.o
-                0x0000000020000664                __pi_mintk
- .bss.__pi_new  0x0000000020000666        0x2 KTMP/kernel.o
-                0x0000000020000666                __pi_new
- .bss.__pi_old  0x0000000020000668        0x2 KTMP/kernel.o
-                0x0000000020000668                __pi_old
- *fill*         0x000000002000066a        0x2 
+                0x000000002000065c        0x2 KTMP/kernel.o
+                0x000000002000065c                __pi_mintk
+ .bss.__pi_new  0x000000002000065e        0x2 KTMP/kernel.o
+                0x000000002000065e                __pi_new
+ .bss.__pi_old  0x0000000020000660        0x2 KTMP/kernel.o
+                0x0000000020000660                __pi_old
+ *fill*         0x0000000020000662        0x2 
  .bss.__pi_systat
-                0x000000002000066c        0x8 KTMP/kernel.o
-                0x000000002000066c                __pi_systat
+                0x0000000020000664        0x8 KTMP/kernel.o
+                0x0000000020000664                __pi_systat
  .bss.__pi_utims
-                0x0000000020000674       0x10 KTMP/kernel.o
-                0x0000000020000674                __pi_utims
- .bss.entropy   0x0000000020000684        0x4 KTMP/kernel.o
-                0x0000000020000684                entropy
- .bss.ioreq     0x0000000020000688        0x4 KTMP/kernel.o
- .bss.mcfree    0x000000002000068c        0x4 KTMP/kernel.o
- .bss.mevent    0x0000000020000690        0x2 KTMP/kernel.o
- *fill*         0x0000000020000692        0x2 
- .bss.mnfree    0x0000000020000694        0x4 KTMP/kernel.o
- .bss.mpools    0x0000000020000698        0x4 KTMP/kernel.o
+                0x000000002000066c       0x10 KTMP/kernel.o
+                0x000000002000066c                __pi_utims
+ .bss.entropy   0x000000002000067c        0x4 KTMP/kernel.o
+                0x000000002000067c                entropy
+ .bss.ioreq     0x0000000020000680        0x4 KTMP/kernel.o
+ .bss.mcfree    0x0000000020000684        0x4 KTMP/kernel.o
+ .bss.mevent    0x0000000020000688        0x2 KTMP/kernel.o
+ *fill*         0x000000002000068a        0x2 
+ .bss.mnfree    0x000000002000068c        0x4 KTMP/kernel.o
+ .bss.mpools    0x0000000020000690        0x4 KTMP/kernel.o
  .bss.descriptors
-                0x000000002000069c       0x20 KTMP/tcv.o
- .bss.oqueues   0x00000000200006bc        0xc KTMP/tcv.o
- .bss.physical  0x00000000200006c8        0xc KTMP/tcv.o
- .bss.physinfo  0x00000000200006d4        0xc KTMP/tcv.o
- .bss.plugins   0x00000000200006e0        0xc KTMP/tcv.o
- .bss.dopen     0x00000000200006ec        0x1 KTMP/storage_mx25r8035.o
- .bss.dstat     0x00000000200006ed        0x1 KTMP/storage_mx25r8035.o
+                0x0000000020000694       0x20 KTMP/tcv.o
+ .bss.oqueues   0x00000000200006b4        0xc KTMP/tcv.o
+ .bss.physical  0x00000000200006c0        0xc KTMP/tcv.o
+ .bss.physinfo  0x00000000200006cc        0xc KTMP/tcv.o
+ .bss.plugins   0x00000000200006d8        0xc KTMP/tcv.o
+ .bss.dopen     0x00000000200006e4        0x1 KTMP/storage_mx25r8035.o
+ .bss.dstat     0x00000000200006e5        0x1 KTMP/storage_mx25r8035.o
  .bss.bckf_timer
-                0x00000000200006ee        0x2 KTMP/rfprop.o
- .bss.channel   0x00000000200006f0        0x1 KTMP/rfprop.o
+                0x00000000200006e6        0x2 KTMP/rfprop.o
+ .bss.channel   0x00000000200006e8        0x1 KTMP/rfprop.o
+ *fill*         0x00000000200006e9        0x3 
+ .bss.drvprcs   0x00000000200006ec        0x4 KTMP/rfprop.o
+ .bss.dstate    0x00000000200006f0        0x1 KTMP/rfprop.o
  *fill*         0x00000000200006f1        0x3 
- .bss.drvprcs   0x00000000200006f4        0x4 KTMP/rfprop.o
- .bss.dstate    0x00000000200006f8        0x1 KTMP/rfprop.o
- *fill*         0x00000000200006f9        0x3 
- .bss.paylen    0x00000000200006fc        0x4 KTMP/rfprop.o
- .bss.physid    0x0000000020000700        0x2 KTMP/rfprop.o
- *fill*         0x0000000020000702        0x2 
- .bss.qevent    0x0000000020000704        0x4 KTMP/rfprop.o
- .bss.rbuffl    0x0000000020000708        0x1 KTMP/rfprop.o
- *fill*         0x0000000020000709        0x3 
- .bss.rfTrim    0x000000002000070c       0x10 KTMP/rfprop.o
- .bss.rxstat    0x000000002000071c        0xc KTMP/rfprop.o
- .bss.statid    0x0000000020000728        0x2 KTMP/rfprop.o
- .bss.txtries   0x000000002000072a        0x1 KTMP/rfprop.o
- *fill*         0x000000002000072b        0x1 
+ .bss.paylen    0x00000000200006f4        0x4 KTMP/rfprop.o
+ .bss.physid    0x00000000200006f8        0x2 KTMP/rfprop.o
+ *fill*         0x00000000200006fa        0x2 
+ .bss.qevent    0x00000000200006fc        0x4 KTMP/rfprop.o
+ .bss.rbuffl    0x0000000020000700        0x1 KTMP/rfprop.o
+ *fill*         0x0000000020000701        0x3 
+ .bss.rfTrim    0x0000000020000704       0x10 KTMP/rfprop.o
+ .bss.rxstat    0x0000000020000714        0xc KTMP/rfprop.o
+ .bss.statid    0x0000000020000720        0x2 KTMP/rfprop.o
+ .bss.txtries   0x0000000020000722        0x1 KTMP/rfprop.o
+ *fill*         0x0000000020000723        0x1 
  .bss.ndsc_null
-                0x000000002000072c        0x4 KTMP/plug_null.o
- .bss.len.0     0x0000000020000730        0x4 KTMP/__outserial.o
- .bss.ptr.1     0x0000000020000734        0x4 KTMP/__outserial.o
+                0x0000000020000724        0x4 KTMP/plug_null.o
+ .bss.len.0     0x0000000020000728        0x4 KTMP/__outserial.o
+ .bss.ptr.1     0x000000002000072c        0x4 KTMP/__outserial.o
  .bss.__inpline
-                0x0000000020000738        0x4 KTMP/__inserial.o
-                0x0000000020000738                __inpline
- .bss.len.0     0x000000002000073c        0x4 KTMP/__inserial.o
- .bss.ptr.1     0x0000000020000740        0x4 KTMP/__inserial.o
+                0x0000000020000730        0x4 KTMP/__inserial.o
+                0x0000000020000730                __inpline
+ .bss.len.0     0x0000000020000734        0x4 KTMP/__inserial.o
+ .bss.ptr.1     0x0000000020000738        0x4 KTMP/__inserial.o
  .bss.oscHfGlobals
-                0x0000000020000744       0x14 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(osc.o)
+                0x000000002000073c       0x14 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(osc.o)
  .bss.powerQualGlobals
-                0x0000000020000758        0x8 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(sys_ctrl.o)
+                0x0000000020000750        0x8 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(sys_ctrl.o)
  *(COMMON)
-                0x0000000020000760                . = ALIGN (0x4)
-                0x0000000020000760                _ebss = .
-                0x0000000020000760                __bss_end__ = .
+                0x0000000020000758                . = ALIGN (0x4)
+                0x0000000020000758                _ebss = .
+                0x0000000020000758                __bss_end__ = .
 
 .ccfg           0x000000000001ffa8       0x58
  *(.ccfg)
@@ -1326,12 +1336,12 @@ Linker script and memory map
  .rel.iplt      0x0000000000020000        0x0 KTMP/app.o
 
 ._user_heap_stack
-                0x0000000020000760      0x100
-                0x0000000020000760                . = ALIGN (0x4)
-                0x0000000020000760                . = (. + _Min_Heap_Size)
-                0x0000000020000860                . = (. + _Min_Stack_Size)
- *fill*         0x0000000020000760      0x100 
-                0x0000000020000860                . = ALIGN (0x4)
+                0x0000000020000758      0x100
+                0x0000000020000758                . = ALIGN (0x4)
+                0x0000000020000758                . = (. + _Min_Heap_Size)
+                0x0000000020000858                . = (. + _Min_Stack_Size)
+ *fill*         0x0000000020000758      0x100 
+                0x0000000020000858                . = ALIGN (0x4)
 
 .gpram
 LOAD KTMP/app.o
@@ -1375,42 +1385,41 @@ END GROUP
 OUTPUT(Image elf32-littlearm)
 LOAD linker stubs
 
-.debug_info     0x0000000000000000     0xcbb3
- .debug_info    0x0000000000000000      0xc09 KTMP/app.o
- .debug_info    0x0000000000000c09     0x1459 KTMP/main.o
- .debug_info    0x0000000000002062     0x114b KTMP/kernel.o
- .debug_info    0x00000000000031ad      0xfa7 KTMP/tcv.o
- .debug_info    0x0000000000004154      0x154 KTMP/startup_gcc.o
- .debug_info    0x00000000000042a8      0x1cd KTMP/ccfg.o
- .debug_info    0x0000000000004475      0x244 KTMP/pin_sensor.o
- .debug_info    0x00000000000046b9      0x1fe KTMP/buttons.o
- .debug_info    0x00000000000048b7      0x779 KTMP/storage_mx25r8035.o
- .debug_info    0x0000000000005030      0x120 KTMP/ser_out.o
- .debug_info    0x0000000000005150      0x10f KTMP/ser_in.o
- .debug_info    0x000000000000525f      0x14e KTMP/ser_outf.o
- .debug_info    0x00000000000053ad      0x14e KTMP/ser_inf.o
- .debug_info    0x00000000000054fb     0x1a29 KTMP/rfprop.o
- .debug_info    0x0000000000006f24      0x3c8 KTMP/plug_null.o
- .debug_info    0x00000000000072ec      0x217 KTMP/__outserial.o
- .debug_info    0x0000000000007503      0x22b KTMP/__inserial.o
- .debug_info    0x000000000000772e      0x31d KTMP/vform.o
- .debug_info    0x0000000000007a4b      0x29d KTMP/vscan.o
- .debug_info    0x0000000000007ce8     0x1407 KTMP/smartrf_settings_lp_hr.o
- .debug_info    0x00000000000090ef      0x18e /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(adi.o)
- .debug_info    0x000000000000927d       0xd9 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(aon_batmon.o)
- .debug_info    0x0000000000009356      0x147 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(aon_rtc.o)
- .debug_info    0x000000000000949d      0x13a /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(cpu.o)
- .debug_info    0x00000000000095d7      0x8c3 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(osc.o)
- .debug_info    0x0000000000009e9a      0xab8 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(rfc.o)
- .debug_info    0x000000000000a952      0x20b /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(setup.o)
- .debug_info    0x000000000000ab5d      0xb1b /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(setup_rom.o)
- .debug_info    0x000000000000b678      0x927 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(sys_ctrl.o)
- .debug_info    0x000000000000bf9f      0x3d0 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(chipinfo.o)
- .debug_info    0x000000000000c36f      0x5ab /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(ddi.o)
- .debug_info    0x000000000000c91a      0x15c /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/nofp/libg.a(lib_a-memcpy-stub.o)
- .debug_info    0x000000000000ca76      0x13d /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/nofp/libg.a(lib_a-memset.o)
+.debug_info     0x0000000000000000     0xcad1
+ .debug_info    0x0000000000000000      0xc36 KTMP/app.o
+ .debug_info    0x0000000000000c36     0x1459 KTMP/main.o
+ .debug_info    0x000000000000208f     0x114b KTMP/kernel.o
+ .debug_info    0x00000000000031da      0xfa7 KTMP/tcv.o
+ .debug_info    0x0000000000004181      0x154 KTMP/startup_gcc.o
+ .debug_info    0x00000000000042d5      0x1cd KTMP/ccfg.o
+ .debug_info    0x00000000000044a2      0x244 KTMP/pin_sensor.o
+ .debug_info    0x00000000000046e6      0x1fe KTMP/buttons.o
+ .debug_info    0x00000000000048e4      0x779 KTMP/storage_mx25r8035.o
+ .debug_info    0x000000000000505d      0x120 KTMP/ser_out.o
+ .debug_info    0x000000000000517d      0x14e KTMP/ser_outf.o
+ .debug_info    0x00000000000052cb      0x14e KTMP/ser_inf.o
+ .debug_info    0x0000000000005419     0x1a29 KTMP/rfprop.o
+ .debug_info    0x0000000000006e42      0x3c8 KTMP/plug_null.o
+ .debug_info    0x000000000000720a      0x217 KTMP/__outserial.o
+ .debug_info    0x0000000000007421      0x22b KTMP/__inserial.o
+ .debug_info    0x000000000000764c      0x31d KTMP/vform.o
+ .debug_info    0x0000000000007969      0x29d KTMP/vscan.o
+ .debug_info    0x0000000000007c06     0x1407 KTMP/smartrf_settings_lp_hr.o
+ .debug_info    0x000000000000900d      0x18e /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(adi.o)
+ .debug_info    0x000000000000919b       0xd9 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(aon_batmon.o)
+ .debug_info    0x0000000000009274      0x147 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(aon_rtc.o)
+ .debug_info    0x00000000000093bb      0x13a /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(cpu.o)
+ .debug_info    0x00000000000094f5      0x8c3 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(osc.o)
+ .debug_info    0x0000000000009db8      0xab8 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(rfc.o)
+ .debug_info    0x000000000000a870      0x20b /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(setup.o)
+ .debug_info    0x000000000000aa7b      0xb1b /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(setup_rom.o)
+ .debug_info    0x000000000000b596      0x927 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(sys_ctrl.o)
+ .debug_info    0x000000000000bebd      0x3d0 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(chipinfo.o)
+ .debug_info    0x000000000000c28d      0x5ab /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(ddi.o)
+ .debug_info    0x000000000000c838      0x15c /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/nofp/libg.a(lib_a-memcpy-stub.o)
+ .debug_info    0x000000000000c994      0x13d /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/nofp/libg.a(lib_a-memset.o)
 
-.debug_abbrev   0x0000000000000000     0x3614
+.debug_abbrev   0x0000000000000000     0x3584
  .debug_abbrev  0x0000000000000000      0x233 KTMP/app.o
  .debug_abbrev  0x0000000000000233      0x55b KTMP/main.o
  .debug_abbrev  0x000000000000078e      0x480 KTMP/kernel.o
@@ -1421,62 +1430,60 @@ LOAD linker stubs
  .debug_abbrev  0x000000000000123c      0x13c KTMP/buttons.o
  .debug_abbrev  0x0000000000001378      0x2db KTMP/storage_mx25r8035.o
  .debug_abbrev  0x0000000000001653       0x97 KTMP/ser_out.o
- .debug_abbrev  0x00000000000016ea       0x90 KTMP/ser_in.o
- .debug_abbrev  0x000000000000177a       0xe1 KTMP/ser_outf.o
- .debug_abbrev  0x000000000000185b       0xe3 KTMP/ser_inf.o
- .debug_abbrev  0x000000000000193e      0x39f KTMP/rfprop.o
- .debug_abbrev  0x0000000000001cdd      0x145 KTMP/plug_null.o
- .debug_abbrev  0x0000000000001e22      0x11e KTMP/__outserial.o
- .debug_abbrev  0x0000000000001f40      0x11b KTMP/__inserial.o
- .debug_abbrev  0x000000000000205b      0x168 KTMP/vform.o
- .debug_abbrev  0x00000000000021c3       0xf1 KTMP/vscan.o
- .debug_abbrev  0x00000000000022b4      0x134 KTMP/smartrf_settings_lp_hr.o
- .debug_abbrev  0x00000000000023e8       0xec /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(adi.o)
- .debug_abbrev  0x00000000000024d4       0x6f /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(aon_batmon.o)
- .debug_abbrev  0x0000000000002543       0xaa /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(aon_rtc.o)
- .debug_abbrev  0x00000000000025ed       0xb0 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(cpu.o)
- .debug_abbrev  0x000000000000269d      0x25d /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(osc.o)
- .debug_abbrev  0x00000000000028fa      0x220 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(rfc.o)
- .debug_abbrev  0x0000000000002b1a      0x142 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(setup.o)
- .debug_abbrev  0x0000000000002c5c      0x261 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(setup_rom.o)
- .debug_abbrev  0x0000000000002ebd      0x2ba /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(sys_ctrl.o)
- .debug_abbrev  0x0000000000003177      0x1ce /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(chipinfo.o)
- .debug_abbrev  0x0000000000003345      0x154 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(ddi.o)
- .debug_abbrev  0x0000000000003499       0xc7 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/nofp/libg.a(lib_a-memcpy-stub.o)
- .debug_abbrev  0x0000000000003560       0xb4 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/nofp/libg.a(lib_a-memset.o)
+ .debug_abbrev  0x00000000000016ea       0xe1 KTMP/ser_outf.o
+ .debug_abbrev  0x00000000000017cb       0xe3 KTMP/ser_inf.o
+ .debug_abbrev  0x00000000000018ae      0x39f KTMP/rfprop.o
+ .debug_abbrev  0x0000000000001c4d      0x145 KTMP/plug_null.o
+ .debug_abbrev  0x0000000000001d92      0x11e KTMP/__outserial.o
+ .debug_abbrev  0x0000000000001eb0      0x11b KTMP/__inserial.o
+ .debug_abbrev  0x0000000000001fcb      0x168 KTMP/vform.o
+ .debug_abbrev  0x0000000000002133       0xf1 KTMP/vscan.o
+ .debug_abbrev  0x0000000000002224      0x134 KTMP/smartrf_settings_lp_hr.o
+ .debug_abbrev  0x0000000000002358       0xec /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(adi.o)
+ .debug_abbrev  0x0000000000002444       0x6f /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(aon_batmon.o)
+ .debug_abbrev  0x00000000000024b3       0xaa /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(aon_rtc.o)
+ .debug_abbrev  0x000000000000255d       0xb0 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(cpu.o)
+ .debug_abbrev  0x000000000000260d      0x25d /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(osc.o)
+ .debug_abbrev  0x000000000000286a      0x220 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(rfc.o)
+ .debug_abbrev  0x0000000000002a8a      0x142 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(setup.o)
+ .debug_abbrev  0x0000000000002bcc      0x261 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(setup_rom.o)
+ .debug_abbrev  0x0000000000002e2d      0x2ba /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(sys_ctrl.o)
+ .debug_abbrev  0x00000000000030e7      0x1ce /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(chipinfo.o)
+ .debug_abbrev  0x00000000000032b5      0x154 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(ddi.o)
+ .debug_abbrev  0x0000000000003409       0xc7 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/nofp/libg.a(lib_a-memcpy-stub.o)
+ .debug_abbrev  0x00000000000034d0       0xb4 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/nofp/libg.a(lib_a-memset.o)
 
-.debug_loc      0x0000000000000000     0x5a5b
- .debug_loc     0x0000000000000000      0x114 KTMP/app.o
- .debug_loc     0x0000000000000114      0x46b KTMP/main.o
- .debug_loc     0x000000000000057f      0xb7d KTMP/kernel.o
- .debug_loc     0x00000000000010fc      0xeb1 KTMP/tcv.o
- .debug_loc     0x0000000000001fad       0x80 KTMP/pin_sensor.o
- .debug_loc     0x000000000000202d       0x70 KTMP/buttons.o
- .debug_loc     0x000000000000209d      0x234 KTMP/storage_mx25r8035.o
- .debug_loc     0x00000000000022d1       0xba KTMP/ser_out.o
- .debug_loc     0x000000000000238b      0x112 KTMP/ser_in.o
- .debug_loc     0x000000000000249d       0x86 KTMP/ser_outf.o
- .debug_loc     0x0000000000002523       0x68 KTMP/ser_inf.o
- .debug_loc     0x000000000000258b      0x4a7 KTMP/rfprop.o
- .debug_loc     0x0000000000002a32      0x108 KTMP/plug_null.o
- .debug_loc     0x0000000000002b3a       0x66 KTMP/__outserial.o
- .debug_loc     0x0000000000002ba0       0x86 KTMP/__inserial.o
- .debug_loc     0x0000000000002c26      0x3ac KTMP/vform.o
- .debug_loc     0x0000000000002fd2      0x3f0 KTMP/vscan.o
- .debug_loc     0x00000000000033c2      0x115 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(adi.o)
- .debug_loc     0x00000000000034d7       0x4e /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(aon_batmon.o)
- .debug_loc     0x0000000000003525       0x26 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(aon_rtc.o)
- .debug_loc     0x000000000000354b      0x3b9 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(osc.o)
- .debug_loc     0x0000000000003904      0x29c /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(rfc.o)
- .debug_loc     0x0000000000003ba0       0xbc /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(setup.o)
- .debug_loc     0x0000000000003c5c      0x9e8 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(setup_rom.o)
- .debug_loc     0x0000000000004644      0x44d /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(sys_ctrl.o)
- .debug_loc     0x0000000000004a91      0x11f /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(chipinfo.o)
- .debug_loc     0x0000000000004bb0      0x79c /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(ddi.o)
- .debug_loc     0x000000000000534c      0x46c /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/nofp/libg.a(lib_a-memcpy-stub.o)
- .debug_loc     0x00000000000057b8      0x2a3 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/nofp/libg.a(lib_a-memset.o)
+.debug_loc      0x0000000000000000     0x5975
+ .debug_loc     0x0000000000000000      0x140 KTMP/app.o
+ .debug_loc     0x0000000000000140      0x46b KTMP/main.o
+ .debug_loc     0x00000000000005ab      0xb7d KTMP/kernel.o
+ .debug_loc     0x0000000000001128      0xeb1 KTMP/tcv.o
+ .debug_loc     0x0000000000001fd9       0x80 KTMP/pin_sensor.o
+ .debug_loc     0x0000000000002059       0x70 KTMP/buttons.o
+ .debug_loc     0x00000000000020c9      0x234 KTMP/storage_mx25r8035.o
+ .debug_loc     0x00000000000022fd       0xba KTMP/ser_out.o
+ .debug_loc     0x00000000000023b7       0x86 KTMP/ser_outf.o
+ .debug_loc     0x000000000000243d       0x68 KTMP/ser_inf.o
+ .debug_loc     0x00000000000024a5      0x4a7 KTMP/rfprop.o
+ .debug_loc     0x000000000000294c      0x108 KTMP/plug_null.o
+ .debug_loc     0x0000000000002a54       0x66 KTMP/__outserial.o
+ .debug_loc     0x0000000000002aba       0x86 KTMP/__inserial.o
+ .debug_loc     0x0000000000002b40      0x3ac KTMP/vform.o
+ .debug_loc     0x0000000000002eec      0x3f0 KTMP/vscan.o
+ .debug_loc     0x00000000000032dc      0x115 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(adi.o)
+ .debug_loc     0x00000000000033f1       0x4e /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(aon_batmon.o)
+ .debug_loc     0x000000000000343f       0x26 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(aon_rtc.o)
+ .debug_loc     0x0000000000003465      0x3b9 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(osc.o)
+ .debug_loc     0x000000000000381e      0x29c /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(rfc.o)
+ .debug_loc     0x0000000000003aba       0xbc /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(setup.o)
+ .debug_loc     0x0000000000003b76      0x9e8 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(setup_rom.o)
+ .debug_loc     0x000000000000455e      0x44d /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(sys_ctrl.o)
+ .debug_loc     0x00000000000049ab      0x11f /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(chipinfo.o)
+ .debug_loc     0x0000000000004aca      0x79c /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(ddi.o)
+ .debug_loc     0x0000000000005266      0x46c /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/nofp/libg.a(lib_a-memcpy-stub.o)
+ .debug_loc     0x00000000000056d2      0x2a3 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/nofp/libg.a(lib_a-memset.o)
 
-.debug_aranges  0x0000000000000000      0xa00
+.debug_aranges  0x0000000000000000      0x9e0
  .debug_aranges
                 0x0000000000000000       0x48 KTMP/app.o
  .debug_aranges
@@ -1498,53 +1505,51 @@ LOAD linker stubs
  .debug_aranges
                 0x00000000000004c0       0x20 KTMP/ser_out.o
  .debug_aranges
-                0x00000000000004e0       0x20 KTMP/ser_in.o
+                0x00000000000004e0       0x20 KTMP/ser_outf.o
  .debug_aranges
-                0x0000000000000500       0x20 KTMP/ser_outf.o
+                0x0000000000000500       0x20 KTMP/ser_inf.o
  .debug_aranges
-                0x0000000000000520       0x20 KTMP/ser_inf.o
+                0x0000000000000520       0x70 KTMP/rfprop.o
  .debug_aranges
-                0x0000000000000540       0x70 KTMP/rfprop.o
+                0x0000000000000590       0x48 KTMP/plug_null.o
  .debug_aranges
-                0x00000000000005b0       0x48 KTMP/plug_null.o
+                0x00000000000005d8       0x20 KTMP/__outserial.o
  .debug_aranges
-                0x00000000000005f8       0x20 KTMP/__outserial.o
+                0x00000000000005f8       0x20 KTMP/__inserial.o
  .debug_aranges
-                0x0000000000000618       0x20 KTMP/__inserial.o
+                0x0000000000000618       0x30 KTMP/vform.o
  .debug_aranges
-                0x0000000000000638       0x30 KTMP/vform.o
+                0x0000000000000648       0x20 KTMP/vscan.o
  .debug_aranges
-                0x0000000000000668       0x20 KTMP/vscan.o
+                0x0000000000000668       0x18 KTMP/smartrf_settings_lp_hr.o
  .debug_aranges
-                0x0000000000000688       0x18 KTMP/smartrf_settings_lp_hr.o
+                0x0000000000000680       0x28 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(adi.o)
  .debug_aranges
-                0x00000000000006a0       0x28 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(adi.o)
+                0x00000000000006a8       0x20 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(aon_batmon.o)
  .debug_aranges
-                0x00000000000006c8       0x20 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(aon_batmon.o)
+                0x00000000000006c8       0x28 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(aon_rtc.o)
  .debug_aranges
-                0x00000000000006e8       0x28 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(aon_rtc.o)
+                0x00000000000006f0       0x40 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(cpu.o)
  .debug_aranges
-                0x0000000000000710       0x40 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(cpu.o)
+                0x0000000000000730       0x68 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(osc.o)
  .debug_aranges
-                0x0000000000000750       0x68 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(osc.o)
+                0x0000000000000798       0x58 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(rfc.o)
  .debug_aranges
-                0x00000000000007b8       0x58 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(rfc.o)
+                0x00000000000007f0       0x28 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(setup.o)
  .debug_aranges
-                0x0000000000000810       0x28 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(setup.o)
+                0x0000000000000818       0xb8 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(setup_rom.o)
  .debug_aranges
-                0x0000000000000838       0xb8 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(setup_rom.o)
+                0x00000000000008d0       0x40 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(sys_ctrl.o)
  .debug_aranges
-                0x00000000000008f0       0x40 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(sys_ctrl.o)
+                0x0000000000000910       0x48 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(chipinfo.o)
  .debug_aranges
-                0x0000000000000930       0x48 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(chipinfo.o)
+                0x0000000000000958       0x48 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(ddi.o)
  .debug_aranges
-                0x0000000000000978       0x48 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(ddi.o)
+                0x00000000000009a0       0x20 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/nofp/libg.a(lib_a-memcpy-stub.o)
  .debug_aranges
-                0x00000000000009c0       0x20 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/nofp/libg.a(lib_a-memcpy-stub.o)
- .debug_aranges
-                0x00000000000009e0       0x20 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/nofp/libg.a(lib_a-memset.o)
+                0x00000000000009c0       0x20 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/nofp/libg.a(lib_a-memset.o)
 
-.debug_ranges   0x0000000000000000     0x1210
+.debug_ranges   0x0000000000000000     0x1200
  .debug_ranges  0x0000000000000000      0x110 KTMP/app.o
  .debug_ranges  0x0000000000000110      0x498 KTMP/main.o
  .debug_ranges  0x00000000000005a8      0x1e0 KTMP/kernel.o
@@ -1554,128 +1559,124 @@ LOAD linker stubs
  .debug_ranges  0x0000000000000918       0x78 KTMP/buttons.o
  .debug_ranges  0x0000000000000990      0x1e8 KTMP/storage_mx25r8035.o
  .debug_ranges  0x0000000000000b78       0x10 KTMP/ser_out.o
- .debug_ranges  0x0000000000000b88       0x10 KTMP/ser_in.o
- .debug_ranges  0x0000000000000b98       0x10 KTMP/ser_outf.o
- .debug_ranges  0x0000000000000ba8       0x10 KTMP/ser_inf.o
- .debug_ranges  0x0000000000000bb8      0x180 KTMP/rfprop.o
- .debug_ranges  0x0000000000000d38       0x38 KTMP/plug_null.o
- .debug_ranges  0x0000000000000d70       0x28 KTMP/__outserial.o
- .debug_ranges  0x0000000000000d98       0x30 KTMP/__inserial.o
- .debug_ranges  0x0000000000000dc8       0x98 KTMP/vform.o
- .debug_ranges  0x0000000000000e60       0x98 KTMP/vscan.o
- .debug_ranges  0x0000000000000ef8       0x18 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(adi.o)
- .debug_ranges  0x0000000000000f10       0x10 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(aon_batmon.o)
- .debug_ranges  0x0000000000000f20       0x18 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(aon_rtc.o)
- .debug_ranges  0x0000000000000f38       0x30 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(cpu.o)
- .debug_ranges  0x0000000000000f68       0x70 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(osc.o)
- .debug_ranges  0x0000000000000fd8       0x48 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(rfc.o)
- .debug_ranges  0x0000000000001020       0x18 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(setup.o)
- .debug_ranges  0x0000000000001038       0xd8 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(setup_rom.o)
- .debug_ranges  0x0000000000001110       0x60 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(sys_ctrl.o)
- .debug_ranges  0x0000000000001170       0x68 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(chipinfo.o)
- .debug_ranges  0x00000000000011d8       0x38 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(ddi.o)
+ .debug_ranges  0x0000000000000b88       0x10 KTMP/ser_outf.o
+ .debug_ranges  0x0000000000000b98       0x10 KTMP/ser_inf.o
+ .debug_ranges  0x0000000000000ba8      0x180 KTMP/rfprop.o
+ .debug_ranges  0x0000000000000d28       0x38 KTMP/plug_null.o
+ .debug_ranges  0x0000000000000d60       0x28 KTMP/__outserial.o
+ .debug_ranges  0x0000000000000d88       0x30 KTMP/__inserial.o
+ .debug_ranges  0x0000000000000db8       0x98 KTMP/vform.o
+ .debug_ranges  0x0000000000000e50       0x98 KTMP/vscan.o
+ .debug_ranges  0x0000000000000ee8       0x18 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(adi.o)
+ .debug_ranges  0x0000000000000f00       0x10 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(aon_batmon.o)
+ .debug_ranges  0x0000000000000f10       0x18 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(aon_rtc.o)
+ .debug_ranges  0x0000000000000f28       0x30 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(cpu.o)
+ .debug_ranges  0x0000000000000f58       0x70 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(osc.o)
+ .debug_ranges  0x0000000000000fc8       0x48 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(rfc.o)
+ .debug_ranges  0x0000000000001010       0x18 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(setup.o)
+ .debug_ranges  0x0000000000001028       0xd8 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(setup_rom.o)
+ .debug_ranges  0x0000000000001100       0x60 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(sys_ctrl.o)
+ .debug_ranges  0x0000000000001160       0x68 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(chipinfo.o)
+ .debug_ranges  0x00000000000011c8       0x38 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(ddi.o)
 
-.debug_line     0x0000000000000000     0x8aeb
- .debug_line    0x0000000000000000      0xe19 KTMP/app.o
- .debug_line    0x0000000000000e19     0x1503 KTMP/main.o
- .debug_line    0x000000000000231c      0xed6 KTMP/kernel.o
- .debug_line    0x00000000000031f2      0xc3e KTMP/tcv.o
- .debug_line    0x0000000000003e30      0x117 KTMP/startup_gcc.o
- .debug_line    0x0000000000003f47       0xeb KTMP/ccfg.o
- .debug_line    0x0000000000004032      0x21c KTMP/pin_sensor.o
- .debug_line    0x000000000000424e      0x2bf KTMP/buttons.o
- .debug_line    0x000000000000450d      0x898 KTMP/storage_mx25r8035.o
- .debug_line    0x0000000000004da5      0x159 KTMP/ser_out.o
- .debug_line    0x0000000000004efe      0x16d KTMP/ser_in.o
- .debug_line    0x000000000000506b      0x14a KTMP/ser_outf.o
- .debug_line    0x00000000000051b5      0x15b KTMP/ser_inf.o
- .debug_line    0x0000000000005310      0xbc2 KTMP/rfprop.o
- .debug_line    0x0000000000005ed2      0x257 KTMP/plug_null.o
- .debug_line    0x0000000000006129      0x183 KTMP/__outserial.o
- .debug_line    0x00000000000062ac      0x22d KTMP/__inserial.o
- .debug_line    0x00000000000064d9      0x39a KTMP/vform.o
- .debug_line    0x0000000000006873      0x272 KTMP/vscan.o
- .debug_line    0x0000000000006ae5      0x1ac KTMP/smartrf_settings_lp_hr.o
- .debug_line    0x0000000000006c91      0x1a0 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(adi.o)
- .debug_line    0x0000000000006e31      0x16b /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(aon_batmon.o)
- .debug_line    0x0000000000006f9c      0x1ad /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(aon_rtc.o)
- .debug_line    0x0000000000007149      0x1a0 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(cpu.o)
- .debug_line    0x00000000000072e9      0x2da /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(osc.o)
- .debug_line    0x00000000000075c3      0x3ab /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(rfc.o)
- .debug_line    0x000000000000796e      0x1ed /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(setup.o)
- .debug_line    0x0000000000007b5b      0x45b /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(setup_rom.o)
- .debug_line    0x0000000000007fb6      0x369 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(sys_ctrl.o)
- .debug_line    0x000000000000831f      0x22f /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(chipinfo.o)
- .debug_line    0x000000000000854e      0x222 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(ddi.o)
- .debug_line    0x0000000000008770      0x1ad /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/nofp/libg.a(lib_a-memcpy-stub.o)
- .debug_line    0x000000000000891d      0x1ce /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/nofp/libg.a(lib_a-memset.o)
+.debug_line     0x0000000000000000     0x8998
+ .debug_line    0x0000000000000000      0xe33 KTMP/app.o
+ .debug_line    0x0000000000000e33     0x1503 KTMP/main.o
+ .debug_line    0x0000000000002336      0xed6 KTMP/kernel.o
+ .debug_line    0x000000000000320c      0xc3e KTMP/tcv.o
+ .debug_line    0x0000000000003e4a      0x117 KTMP/startup_gcc.o
+ .debug_line    0x0000000000003f61       0xeb KTMP/ccfg.o
+ .debug_line    0x000000000000404c      0x21c KTMP/pin_sensor.o
+ .debug_line    0x0000000000004268      0x2bf KTMP/buttons.o
+ .debug_line    0x0000000000004527      0x898 KTMP/storage_mx25r8035.o
+ .debug_line    0x0000000000004dbf      0x159 KTMP/ser_out.o
+ .debug_line    0x0000000000004f18      0x14a KTMP/ser_outf.o
+ .debug_line    0x0000000000005062      0x15b KTMP/ser_inf.o
+ .debug_line    0x00000000000051bd      0xbc2 KTMP/rfprop.o
+ .debug_line    0x0000000000005d7f      0x257 KTMP/plug_null.o
+ .debug_line    0x0000000000005fd6      0x183 KTMP/__outserial.o
+ .debug_line    0x0000000000006159      0x22d KTMP/__inserial.o
+ .debug_line    0x0000000000006386      0x39a KTMP/vform.o
+ .debug_line    0x0000000000006720      0x272 KTMP/vscan.o
+ .debug_line    0x0000000000006992      0x1ac KTMP/smartrf_settings_lp_hr.o
+ .debug_line    0x0000000000006b3e      0x1a0 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(adi.o)
+ .debug_line    0x0000000000006cde      0x16b /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(aon_batmon.o)
+ .debug_line    0x0000000000006e49      0x1ad /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(aon_rtc.o)
+ .debug_line    0x0000000000006ff6      0x1a0 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(cpu.o)
+ .debug_line    0x0000000000007196      0x2da /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(osc.o)
+ .debug_line    0x0000000000007470      0x3ab /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(rfc.o)
+ .debug_line    0x000000000000781b      0x1ed /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(setup.o)
+ .debug_line    0x0000000000007a08      0x45b /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(setup_rom.o)
+ .debug_line    0x0000000000007e63      0x369 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(sys_ctrl.o)
+ .debug_line    0x00000000000081cc      0x22f /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(chipinfo.o)
+ .debug_line    0x00000000000083fb      0x222 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(ddi.o)
+ .debug_line    0x000000000000861d      0x1ad /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/nofp/libg.a(lib_a-memcpy-stub.o)
+ .debug_line    0x00000000000087ca      0x1ce /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/nofp/libg.a(lib_a-memset.o)
 
-.debug_str      0x0000000000000000     0x4098
- .debug_str     0x0000000000000000      0xa06 KTMP/app.o
-                                        0xab7 (size before relaxing)
- .debug_str     0x0000000000000a06      0x682 KTMP/main.o
+.debug_str      0x0000000000000000     0x4085
+ .debug_str     0x0000000000000000      0xa3b KTMP/app.o
+                                        0xaec (size before relaxing)
+ .debug_str     0x0000000000000a3b      0x682 KTMP/main.o
                                         0x886 (size before relaxing)
- .debug_str     0x0000000000001088      0x265 KTMP/kernel.o
+ .debug_str     0x00000000000010bd      0x265 KTMP/kernel.o
                                         0x5a0 (size before relaxing)
- .debug_str     0x00000000000012ed      0x269 KTMP/tcv.o
+ .debug_str     0x0000000000001322      0x269 KTMP/tcv.o
                                         0x4cd (size before relaxing)
- .debug_str     0x0000000000001556       0xae KTMP/startup_gcc.o
+ .debug_str     0x000000000000158b       0xae KTMP/startup_gcc.o
                                         0x240 (size before relaxing)
- .debug_str     0x0000000000001604      0x1d8 KTMP/ccfg.o
+ .debug_str     0x0000000000001639      0x1d8 KTMP/ccfg.o
                                         0x369 (size before relaxing)
- .debug_str     0x00000000000017dc       0x78 KTMP/pin_sensor.o
+ .debug_str     0x0000000000001811       0x78 KTMP/pin_sensor.o
                                         0x277 (size before relaxing)
- .debug_str     0x0000000000001854       0x78 KTMP/buttons.o
+ .debug_str     0x0000000000001889       0x78 KTMP/buttons.o
                                         0x24f (size before relaxing)
- .debug_str     0x00000000000018cc      0x113 KTMP/storage_mx25r8035.o
+ .debug_str     0x0000000000001901      0x113 KTMP/storage_mx25r8035.o
                                         0x332 (size before relaxing)
- .debug_str     0x00000000000019df       0x4a KTMP/ser_out.o
+ .debug_str     0x0000000000001a14       0x4a KTMP/ser_out.o
                                         0x1fc (size before relaxing)
- .debug_str     0x0000000000001a29       0x52 KTMP/ser_in.o
-                                        0x1fc (size before relaxing)
- .debug_str     0x0000000000001a7b       0x4c KTMP/ser_outf.o
+ .debug_str     0x0000000000001a5e       0x4c KTMP/ser_outf.o
                                         0x21c (size before relaxing)
- .debug_str     0x0000000000001ac7       0x4a KTMP/ser_inf.o
+ .debug_str     0x0000000000001aaa       0x54 KTMP/ser_inf.o
                                         0x224 (size before relaxing)
- .debug_str     0x0000000000001b11      0x880 KTMP/rfprop.o
+ .debug_str     0x0000000000001afe      0x880 KTMP/rfprop.o
                                         0xb54 (size before relaxing)
- .debug_str     0x0000000000002391       0x70 KTMP/plug_null.o
+ .debug_str     0x000000000000237e       0x70 KTMP/plug_null.o
                                         0x2a1 (size before relaxing)
- .debug_str     0x0000000000002401       0x63 KTMP/__outserial.o
+ .debug_str     0x00000000000023ee       0x63 KTMP/__outserial.o
                                         0x274 (size before relaxing)
- .debug_str     0x0000000000002464       0x50 KTMP/__inserial.o
+ .debug_str     0x0000000000002451       0x50 KTMP/__inserial.o
                                         0x279 (size before relaxing)
- .debug_str     0x00000000000024b4       0x5e KTMP/vform.o
+ .debug_str     0x00000000000024a1       0x5e KTMP/vform.o
                                         0x24a (size before relaxing)
- .debug_str     0x0000000000002512       0x61 KTMP/vscan.o
+ .debug_str     0x00000000000024ff       0x61 KTMP/vscan.o
                                         0x23c (size before relaxing)
- .debug_str     0x0000000000002573       0x60 KTMP/smartrf_settings_lp_hr.o
+ .debug_str     0x0000000000002560       0x60 KTMP/smartrf_settings_lp_hr.o
                                         0x620 (size before relaxing)
- .debug_str     0x00000000000025d3      0x1be /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(adi.o)
+ .debug_str     0x00000000000025c0      0x1be /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(adi.o)
                                         0x259 (size before relaxing)
- .debug_str     0x0000000000002791       0x7e /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(aon_batmon.o)
+ .debug_str     0x000000000000277e       0x7e /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(aon_batmon.o)
                                         0x221 (size before relaxing)
- .debug_str     0x000000000000280f       0xce /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(aon_rtc.o)
+ .debug_str     0x00000000000027fc       0xce /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(aon_rtc.o)
                                         0x27f (size before relaxing)
- .debug_str     0x00000000000028dd       0x61 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(cpu.o)
+ .debug_str     0x00000000000028ca       0x61 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(cpu.o)
                                         0x227 (size before relaxing)
- .debug_str     0x000000000000293e      0x5d2 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(osc.o)
+ .debug_str     0x000000000000292b      0x5d2 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(osc.o)
                                         0x822 (size before relaxing)
- .debug_str     0x0000000000002f10      0x1c9 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(rfc.o)
+ .debug_str     0x0000000000002efd      0x1c9 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(rfc.o)
                                         0x603 (size before relaxing)
- .debug_str     0x00000000000030d9      0x203 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(setup.o)
+ .debug_str     0x00000000000030c6      0x203 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(setup.o)
                                         0x3ab (size before relaxing)
- .debug_str     0x00000000000032dc      0x4b8 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(setup_rom.o)
+ .debug_str     0x00000000000032c9      0x4b8 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(setup_rom.o)
                                         0x792 (size before relaxing)
- .debug_str     0x0000000000003794      0x26f /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(sys_ctrl.o)
+ .debug_str     0x0000000000003781      0x26f /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(sys_ctrl.o)
                                         0x7e2 (size before relaxing)
- .debug_str     0x0000000000003a03      0x3c3 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(chipinfo.o)
+ .debug_str     0x00000000000039f0      0x3c3 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(chipinfo.o)
                                         0x5ae (size before relaxing)
- .debug_str     0x0000000000003dc6       0xf2 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(ddi.o)
+ .debug_str     0x0000000000003db3       0xf2 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(ddi.o)
                                         0x316 (size before relaxing)
- .debug_str     0x0000000000003eb8      0x147 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/nofp/libg.a(lib_a-memcpy-stub.o)
+ .debug_str     0x0000000000003ea5      0x147 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/nofp/libg.a(lib_a-memcpy-stub.o)
                                         0x1de (size before relaxing)
- .debug_str     0x0000000000003fff       0x99 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/nofp/libg.a(lib_a-memset.o)
+ .debug_str     0x0000000000003fec       0x99 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/nofp/libg.a(lib_a-memset.o)
                                         0x1b9 (size before relaxing)
 
 .comment        0x0000000000000000       0xa3
@@ -1690,7 +1691,6 @@ LOAD linker stubs
  .comment       0x0000000000000033       0x34 KTMP/buttons.o
  .comment       0x0000000000000033       0x34 KTMP/storage_mx25r8035.o
  .comment       0x0000000000000033       0x34 KTMP/ser_out.o
- .comment       0x0000000000000033       0x34 KTMP/ser_in.o
  .comment       0x0000000000000033       0x34 KTMP/ser_outf.o
  .comment       0x0000000000000033       0x34 KTMP/ser_inf.o
  .comment       0x0000000000000033       0x34 KTMP/rfprop.o
@@ -1738,53 +1738,51 @@ LOAD linker stubs
  .ARM.attributes
                 0x000000000000019b       0x2d KTMP/ser_out.o
  .ARM.attributes
-                0x00000000000001c8       0x2d KTMP/ser_in.o
+                0x00000000000001c8       0x2d KTMP/ser_outf.o
  .ARM.attributes
-                0x00000000000001f5       0x2d KTMP/ser_outf.o
+                0x00000000000001f5       0x2d KTMP/ser_inf.o
  .ARM.attributes
-                0x0000000000000222       0x2d KTMP/ser_inf.o
+                0x0000000000000222       0x2d KTMP/rfprop.o
  .ARM.attributes
-                0x000000000000024f       0x2d KTMP/rfprop.o
+                0x000000000000024f       0x2d KTMP/plug_null.o
  .ARM.attributes
-                0x000000000000027c       0x2d KTMP/plug_null.o
+                0x000000000000027c       0x2d KTMP/__outserial.o
  .ARM.attributes
-                0x00000000000002a9       0x2d KTMP/__outserial.o
+                0x00000000000002a9       0x2d KTMP/__inserial.o
  .ARM.attributes
-                0x00000000000002d6       0x2d KTMP/__inserial.o
+                0x00000000000002d6       0x2d KTMP/vform.o
  .ARM.attributes
-                0x0000000000000303       0x2d KTMP/vform.o
+                0x0000000000000303       0x2d KTMP/vscan.o
  .ARM.attributes
-                0x0000000000000330       0x2d KTMP/vscan.o
+                0x0000000000000330       0x33 KTMP/smartrf_settings_lp_hr.o
  .ARM.attributes
-                0x000000000000035d       0x33 KTMP/smartrf_settings_lp_hr.o
+                0x0000000000000363       0x33 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(adi.o)
  .ARM.attributes
-                0x0000000000000390       0x33 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(adi.o)
+                0x0000000000000396       0x33 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(aon_batmon.o)
  .ARM.attributes
-                0x00000000000003c3       0x33 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(aon_batmon.o)
+                0x00000000000003c9       0x33 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(aon_rtc.o)
  .ARM.attributes
-                0x00000000000003f6       0x33 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(aon_rtc.o)
+                0x00000000000003fc       0x33 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(cpu.o)
  .ARM.attributes
-                0x0000000000000429       0x33 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(cpu.o)
+                0x000000000000042f       0x33 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(osc.o)
  .ARM.attributes
-                0x000000000000045c       0x33 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(osc.o)
+                0x0000000000000462       0x33 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(rfc.o)
  .ARM.attributes
-                0x000000000000048f       0x33 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(rfc.o)
+                0x0000000000000495       0x33 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(setup.o)
  .ARM.attributes
-                0x00000000000004c2       0x33 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(setup.o)
+                0x00000000000004c8       0x33 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(setup_rom.o)
  .ARM.attributes
-                0x00000000000004f5       0x33 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(setup_rom.o)
+                0x00000000000004fb       0x33 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(sys_ctrl.o)
  .ARM.attributes
-                0x0000000000000528       0x33 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(sys_ctrl.o)
+                0x000000000000052e       0x33 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(chipinfo.o)
  .ARM.attributes
-                0x000000000000055b       0x33 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(chipinfo.o)
+                0x0000000000000561       0x33 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(ddi.o)
  .ARM.attributes
-                0x000000000000058e       0x33 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(ddi.o)
+                0x0000000000000594       0x2a /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/nofp/libg.a(lib_a-memcpy-stub.o)
  .ARM.attributes
-                0x00000000000005c1       0x2a /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/nofp/libg.a(lib_a-memcpy-stub.o)
- .ARM.attributes
-                0x00000000000005eb       0x2a /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/nofp/libg.a(lib_a-memset.o)
+                0x00000000000005be       0x2a /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/nofp/libg.a(lib_a-memset.o)
 
-.debug_frame    0x0000000000000000     0x18b0
+.debug_frame    0x0000000000000000     0x1880
  .debug_frame   0x0000000000000000      0x154 KTMP/app.o
  .debug_frame   0x0000000000000154      0x2b0 KTMP/main.o
  .debug_frame   0x0000000000000404      0x3d4 KTMP/kernel.o
@@ -1794,25 +1792,24 @@ LOAD linker stubs
  .debug_frame   0x0000000000000bd0       0x68 KTMP/buttons.o
  .debug_frame   0x0000000000000c38      0x190 KTMP/storage_mx25r8035.o
  .debug_frame   0x0000000000000dc8       0x30 KTMP/ser_out.o
- .debug_frame   0x0000000000000df8       0x30 KTMP/ser_in.o
- .debug_frame   0x0000000000000e28       0x44 KTMP/ser_outf.o
- .debug_frame   0x0000000000000e6c       0x44 KTMP/ser_inf.o
- .debug_frame   0x0000000000000eb0      0x180 KTMP/rfprop.o
- .debug_frame   0x0000000000001030       0x84 KTMP/plug_null.o
- .debug_frame   0x00000000000010b4       0x3c KTMP/__outserial.o
- .debug_frame   0x00000000000010f0       0x48 KTMP/__inserial.o
- .debug_frame   0x0000000000001138       0x6c KTMP/vform.o
- .debug_frame   0x00000000000011a4       0x34 KTMP/vscan.o
- .debug_frame   0x00000000000011d8       0x64 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(adi.o)
- .debug_frame   0x000000000000123c       0x20 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(aon_batmon.o)
- .debug_frame   0x000000000000125c       0x30 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(aon_rtc.o)
- .debug_frame   0x000000000000128c       0x60 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(cpu.o)
- .debug_frame   0x00000000000012ec      0x104 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(osc.o)
- .debug_frame   0x00000000000013f0       0xb0 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(rfc.o)
- .debug_frame   0x00000000000014a0       0x44 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(setup.o)
- .debug_frame   0x00000000000014e4      0x194 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(setup_rom.o)
- .debug_frame   0x0000000000001678       0x9c /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(sys_ctrl.o)
- .debug_frame   0x0000000000001714       0x8c /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(chipinfo.o)
- .debug_frame   0x00000000000017a0       0xac /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(ddi.o)
- .debug_frame   0x000000000000184c       0x34 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/nofp/libg.a(lib_a-memcpy-stub.o)
- .debug_frame   0x0000000000001880       0x30 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/nofp/libg.a(lib_a-memset.o)
+ .debug_frame   0x0000000000000df8       0x44 KTMP/ser_outf.o
+ .debug_frame   0x0000000000000e3c       0x44 KTMP/ser_inf.o
+ .debug_frame   0x0000000000000e80      0x180 KTMP/rfprop.o
+ .debug_frame   0x0000000000001000       0x84 KTMP/plug_null.o
+ .debug_frame   0x0000000000001084       0x3c KTMP/__outserial.o
+ .debug_frame   0x00000000000010c0       0x48 KTMP/__inserial.o
+ .debug_frame   0x0000000000001108       0x6c KTMP/vform.o
+ .debug_frame   0x0000000000001174       0x34 KTMP/vscan.o
+ .debug_frame   0x00000000000011a8       0x64 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(adi.o)
+ .debug_frame   0x000000000000120c       0x20 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(aon_batmon.o)
+ .debug_frame   0x000000000000122c       0x30 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(aon_rtc.o)
+ .debug_frame   0x000000000000125c       0x60 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(cpu.o)
+ .debug_frame   0x00000000000012bc      0x104 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(osc.o)
+ .debug_frame   0x00000000000013c0       0xb0 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(rfc.o)
+ .debug_frame   0x0000000000001470       0x44 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(setup.o)
+ .debug_frame   0x00000000000014b4      0x194 /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(setup_rom.o)
+ .debug_frame   0x0000000000001648       0x9c /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(sys_ctrl.o)
+ .debug_frame   0x00000000000016e4       0x8c /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(chipinfo.o)
+ .debug_frame   0x0000000000001770       0xac /home/weavers5/Desktop/OLSONET/PICOS/PicOS/CC13XX/CC13XXWARE/driverlib/bin/gcc/driverlib.lib(ddi.o)
+ .debug_frame   0x000000000000181c       0x34 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/nofp/libg.a(lib_a-memcpy-stub.o)
+ .debug_frame   0x0000000000001850       0x30 /usr/lib/gcc/arm-none-eabi/10.3.1/../../../arm-none-eabi/lib/thumb/nofp/libg.a(lib_a-memset.o)

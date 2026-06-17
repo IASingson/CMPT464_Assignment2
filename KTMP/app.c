@@ -6016,6 +6016,8 @@ byte delete_destination_id;
 byte delete_response_received;
 byte delete_response_status;
 
+int read_byte_tracker;
+
 byte pending_req;
 byte pending_dest;
 byte pending_type;
@@ -6062,13 +6064,14 @@ struct Record database[40];
 #define READ_DEST 1
 #define ASK_RECORD 2
 #define READ_RECORD 3
-#define SEND_CREATE 4
-#define WAIT_RESPONSE 5
-#define TIMEOUT 6
-#define GOT_RESPONSE 7
-# 80 "app.cc"
+#define READ_RECORD_HELP 4
+#define SEND_CREATE 5
+#define WAIT_RESPONSE 6
+#define TIMEOUT 7
+#define GOT_RESPONSE 8
+# 82 "app.cc"
 void Create (word __pi_st) { switch (__pi_st) { 
-# 80 "app.cc"
+# 82 "app.cc"
 
  static address packet;
  static char *p;
@@ -6077,6 +6080,7 @@ void Create (word __pi_st) { switch (__pi_st) {
  static char record_data[20];
 
  static int i;
+ static char temp_char;
 
 
  case ASK_DEST : __stlab_ASK_DEST: {
@@ -6095,6 +6099,8 @@ void Create (word __pi_st) { switch (__pi_st) {
    record_data[i] = '\0';
   }
 
+  i = 0;
+
   proceed (ASK_RECORD);
 
  } case ASK_RECORD : __stlab_ASK_RECORD: {
@@ -6102,21 +6108,37 @@ void Create (word __pi_st) { switch (__pi_st) {
   proceed (READ_RECORD);
 
  } case READ_RECORD : __stlab_READ_RECORD: {
-  ser_in(READ_RECORD, record_data, 19);
+  temp_char = '\0';
+  ser_inf(READ_RECORD_HELP, "%s", &record_data);
+  __pi_release ();
 
-  proceed (SEND_CREATE);
+ } case READ_RECORD_HELP : __stlab_READ_RECORD_HELP: {
+
+
+
+
+
+
+
+
+
+
+
+  ser_outf(SEND_CREATE, "%s", record_data);
+  __pi_release ();
+
 
   } case SEND_CREATE : __stlab_SEND_CREATE: {
-  ser_outf(SEND_CREATE, "%c", record_data);
-        pending_req = (byte)((word)(lrnd () >> 16));
-        pending_destination_id = (byte)destination_id;
+
+        pending_request_num = (byte)((word)(lrnd () >> 16));
+        pending_destination_id = (byte)dest_id;
         pending_type = 2;
         pending_active = 1;
 
         reply_received = 0;
         reply_status = 0;
 
-        packet = tcv_wnps (SEND_CREATE, sfd, 7, 0);
+        packet = tcv_wnps (SEND_CREATE, sfd, 28, 0);
 
         packet[0] = 0;
         p = (char *)(packet);
@@ -6124,7 +6146,7 @@ void Create (word __pi_st) { switch (__pi_st) {
         *p++ = (group_ID >> 8) & 0xFF;
         *p++ = group_ID & 0xFF;
         *p++ = 2;
-        *p++ = pending_req;
+        *p++ = pending_request_num;
         *p++ = node_ID;
         *p++ = pending_destination_id;
 
@@ -6143,7 +6165,6 @@ void Create (word __pi_st) { switch (__pi_st) {
 
         delay(3000, TIMEOUT);
         __pi_release ();
-  proceed (TIMEOUT);
 
 
     } case TIMEOUT : __stlab_TIMEOUT: {
@@ -6173,11 +6194,12 @@ break; } default: __pi_badstate (); } }
 #undef READ_DEST
 #undef ASK_RECORD
 #undef READ_RECORD
+#undef READ_RECORD_HELP
 #undef SEND_CREATE
 #undef WAIT_RESPONSE
 #undef TIMEOUT
 #undef GOT_RESPONSE
-# 179 "app.cc"
+# 199 "app.cc"
 
 
 
@@ -6189,9 +6211,9 @@ break; } default: __pi_badstate (); } }
 #define WAIT_RESPONSE 5
 #define TIMEOUT 6
 #define GOT_RESPONSE 7
-# 181 "app.cc"
+# 201 "app.cc"
 void Retrieve (word __pi_st) { switch (__pi_st) { 
-# 181 "app.cc"
+# 201 "app.cc"
 
     static address packet;
     static char *p;
@@ -6227,7 +6249,7 @@ void Retrieve (word __pi_st) { switch (__pi_st) {
   proceed (SEND_RETRIEVE);
 
     } case SEND_RETRIEVE : __stlab_SEND_RETRIEVE: {
-        pending_req = (byte)((word)(lrnd () >> 16));
+        pending_request_num = (byte)((word)(lrnd () >> 16));
         pending_destination_id = (byte)dest_id;
         pending_type = 4;
         pending_active = 1;
@@ -6244,7 +6266,7 @@ void Retrieve (word __pi_st) { switch (__pi_st) {
         *p++ = (group_ID >> 8) & 0xFF;
         *p++ = group_ID & 0xFF;
         *p++ = 4;
-        *p++ = pending_req;
+        *p++ = pending_request_num;
         *p++ = node_ID;
         *p++ = pending_destination_id;
         *p++ = (byte)record_index;
@@ -6259,7 +6281,6 @@ void Retrieve (word __pi_st) { switch (__pi_st) {
 
         delay(3000, TIMEOUT);
         __pi_release ();
-  proceed (TIMEOUT);
 
     } case TIMEOUT : __stlab_TIMEOUT: {
         if (reply_received) {
@@ -6295,7 +6316,7 @@ break; } default: __pi_badstate (); } }
 #undef WAIT_RESPONSE
 #undef TIMEOUT
 #undef GOT_RESPONSE
-# 275 "app.cc"
+# 294 "app.cc"
 
 
 
@@ -6311,9 +6332,9 @@ break; } default: __pi_badstate (); } }
 #define HANDLE_RETRIEVE 9
 #define SEND_RETRIEVE_OK_RESP 10
 #define SEND_RETRIEVE_FAIL_RESP 11
-# 277 "app.cc"
+# 296 "app.cc"
 void Receiver (word __pi_st) { switch (__pi_st) { 
-# 277 "app.cc"
+# 296 "app.cc"
 
  static address packet;
  static address response;
@@ -6409,12 +6430,13 @@ void Receiver (word __pi_st) { switch (__pi_st) {
 
 
 
-  response = tcv_wnps (SEND_DISC_RESP, sfd, 6, 0);
+  response = tcv_wnps (SEND_DISC_RESP, sfd, 7, 0);
 
   response[0] = 0;
   q = (char *)(response + 1);
   *q++ = (group_ID >> 8) & 0xFF;
   *q++ = group_ID & 0xFF;
+  *q++ = 1;
   *q++ = request_num;
   *q++ = node_ID;
   *q++ = sender_id;
@@ -6436,7 +6458,7 @@ void Receiver (word __pi_st) { switch (__pi_st) {
     }
   }
   if (!found && find_neighbor_count < 20){
-   find_neighbors[find_neighbor_count] == sender_id;
+   find_neighbors[find_neighbor_count] = sender_id;
    find_neighbor_count++;
   }
   tcv_endp(packet);
@@ -6612,7 +6634,7 @@ break; } default: __pi_badstate (); } }
 #undef HANDLE_RETRIEVE
 #undef SEND_RETRIEVE_OK_RESP
 #undef SEND_RETRIEVE_FAIL_RESP
-# 562 "app.cc"
+# 582 "app.cc"
 
 
 
@@ -6623,9 +6645,9 @@ break; } default: __pi_badstate (); } }
 #define Print_Neighbors_Header 4
 #define Print_Neighbor_Item 5
 #define Finish_Find 6
-# 564 "app.cc"
+# 584 "app.cc"
 void Find (word __pi_st) { switch (__pi_st) { 
-# 564 "app.cc"
+# 584 "app.cc"
 
 
 
@@ -6662,6 +6684,7 @@ void Find (word __pi_st) { switch (__pi_st) {
  } case Wait_For_Responses : __stlab_Wait_For_Responses: {
 
   delay(3000, Check_Responses);
+  __pi_release ();
 
  } case Check_Responses : __stlab_Check_Responses: {
 
@@ -6698,7 +6721,7 @@ break; } default: __pi_badstate (); } }
 #undef Print_Neighbors_Header
 #undef Print_Neighbor_Item
 #undef Finish_Find
-# 628 "app.cc"
+# 649 "app.cc"
 
 
 
@@ -6710,9 +6733,9 @@ break; } default: __pi_badstate (); } }
 #define Wait_Response 5
 #define Timeout 6
 #define Print_Result 7
-# 630 "app.cc"
+# 651 "app.cc"
 void Delete (word __pi_st) { switch (__pi_st) { 
-# 630 "app.cc"
+# 651 "app.cc"
 
  static address packet;
  static char *read_packet;
@@ -6771,6 +6794,7 @@ void Delete (word __pi_st) { switch (__pi_st) {
    proceed (Print_Result);
   }
   delay(3000, Timeout);
+  __pi_release ();
 
  } case Timeout : __stlab_Timeout: {
   if (delete_response_received){
@@ -6799,7 +6823,7 @@ break; } default: __pi_badstate (); } }
 #undef Wait_Response
 #undef Timeout
 #undef Print_Result
-# 707 "app.cc"
+# 729 "app.cc"
 
 
 
@@ -6827,16 +6851,16 @@ break; } default: __pi_badstate (); } }
 #define Show_LocalDB 21
 #define Show_LocalDB_Item 22
 #define Reset_DB 23
-# 709 "app.cc"
+# 731 "app.cc"
 void root (word __pi_st) { switch (__pi_st) { 
-# 709 "app.cc"
+# 731 "app.cc"
 
 
  static char choice;
  static int db_print_index;
 
  static int temp;
-# 714 "app.cc"
+# 736 "app.cc"
  static int i;
 
  case Init : __stlab_Init: {
@@ -6961,7 +6985,8 @@ void root (word __pi_st) { switch (__pi_st) {
    proceed (Menu_Print);
   }
   else{
-   delay(100, Wait_Create_Finish); }
+   delay(100, Wait_Create_Finish);
+  }
   __pi_release ();
 
  } case Handle_Retrieve : __stlab_Handle_Retrieve: {
@@ -7086,5 +7111,5 @@ break; } default: __pi_badstate (); } }
 #undef Show_LocalDB
 #undef Show_LocalDB_Item
 #undef Reset_DB
-# 938 "app.cc"
+# 961 "app.cc"
 
