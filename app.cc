@@ -849,7 +849,7 @@ fsm root
 			proceed Menu_Print;
 		}
 		else{
-			proceed Wait_Retrieve_Finish;
+			delay(100, Wait_Retrieve_Finish);
 		}
 		release;
 		
@@ -864,7 +864,7 @@ fsm root
 			proceed Menu_Print;
 		}
 		else{
-			proceed Wait_Delete_Finish;
+			delay(100,Wait_Delete_Finish);
 		}
 		release;
 
@@ -878,10 +878,10 @@ fsm root
 		if (find_complete == 1) {
 			proceed Menu_Print;
 		}
-		delay(100, Wait_Find_Loop);
-	state Wait_Find_Loop:
-		proceed Wait_Find_Finish;
-
+		else{
+			delay(100, Wait_Find_Loop);
+		}
+		release;
 	
 		
 		// NEW GROUP ID
